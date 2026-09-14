@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Undergrounds - Admin Dashboard</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: {
+              gold: '#D4AF37',
+              dark: '#0B0C10',
+              panel: 'rgba(255, 255, 255, 0.03)',
+              panelBorder: 'rgba(255, 255, 255, 0.08)',
+              lightBg: '#F8FAFC',
+              lightPanel: '#FFFFFF',
+              lightBorder: '#E2E8F0'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Firebase SDK (Compat v9) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-functions-compat.js"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* Dark Theme (Default) */
+    body { 
+      background-color: #0B0C10; 
+      color: #E2E8F0; 
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(212, 175, 55, 0.04), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.04), transparent 25%);
+      background-attachment: fixed;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .glass-panel {
+      background: var(--tw-colors-brand-panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--tw-colors-brand-panelBorder);
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    /* Light Theme Overrides */
+    body.light-theme {
+      background-color: #F8FAFC;
+      color: #1E293B;
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(212, 175, 55, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.08), transparent 25%);
+    }
+    body.light-theme .glass-panel {
+      background: #FFFFFF;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      border: 1px solid #E2E8F0;
+    }
+    body.light-theme .text-white { color: #0f172a; }
+    body.light-theme .text-gray-400 { color: #64748b; }
+    body.light-theme .text-gray-500 { color: #94a3b8; }
+    body.light-theme .bg-black\/50 { background-color: #f1f5f9; }
+    body.light-theme .bg-black\/40 { background-color: #f8fafc; }
+    body.light-theme .hover\:bg-white\/5:hover { background-color: #f1f5f9; }
+    body.light-theme .border-brand-panelBorder { border-color: #e2e8f0; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+    body:not(.light-theme) ::-webkit-scrollbar-thumb { background: #334155; }
+    
+    .spinner {
+      border: 3px solid rgba(212, 175, 55, 0.2);
+      border-radius: 50%;
+      border-top: 3px solid #D4AF37;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="h-screen flex flex-col items-center p-2 lg:p-6 font-sans transition-colors duration-300 overflow-hidden">
+
+  <!-- ================= LOGIN SECTION ================= -->
+  <div id="login-section" class="w-full max-w-md mt-20 flex flex-col hidden">
+    <div class="glass-panel p-8 rounded-2xl shadow-2xl relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+      
+      <div class="text-center mb-8 relative z-10">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center shadow-lg shadow-yellow-500/20">
+          <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        </div>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Admin Secure Login</h1>
+        <p class="text-sm text-gray-500 mt-2">Sign in to manage Undergrounds users</p>
+      </div>
+
+      <form id="login-form" class="space-y-5 relative z-10">
+        <div>
+          <label class="block text-sm font-medium text-gray-500 mb-1.5">Admin Email</label>
+          <input type="email" id="email" class="w-full px-4 py-2.5 bg-black/50 border border-brand-panelBorder rounded-lg focus:outline-none focus:border-brand-gold text-white transition-colors" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-500 mb-1.5">Password</label>
+          <input type="password" id="password" class="w-full px-4 py-2.5 bg-black/50 border border-brand-panelBorder rounded-lg focus:outline-none focus:border-brand-gold text-white transition-colors" required>
+        </div>
+        <button id="login-btn" type="submit" class="w-full bg-brand-gold hover:bg-yellow-500 text-black font-bold py-2.5 rounded-lg transition-colors shadow-lg shadow-yellow-500/20 mt-2">
+          Authenticate
+        </button>
+        <p id="login-error" class="text-red-500 text-sm text-center mt-2 hidden"></p>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= DASHBOARD SECTION ================= -->
+  <div id="dashboard-section" class="w-full h-full hidden flex-col lg:flex-row gap-6">
+    
+    <!-- Sidebar -->
+    <aside class="w-full lg:w-72 flex-shrink-0 flex flex-col gap-2 glass-panel p-5 rounded-3xl lg:h-full lg:overflow-y-auto z-20 border border-brand-panelBorder shadow-2xl">
+      <!-- Sidebar Header (Logo/Title) -->
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center shadow-md">
+          <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-white tracking-tight leading-none">Undergrounds</h1>
+          <p class="text-[10px] text-brand-gold uppercase tracking-wider font-bold mt-1">Admin Panel</p>
+        </div>
+      </div>
+      
+      <!-- Menu Items -->
+      <div class="flex flex-col gap-2 flex-1">
+        <button id="nav-users" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-bold text-brand-gold bg-brand-gold/10 border border-brand-gold/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          Students Management
+        </button>
+        <button id="nav-creators" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          Content Creators
+        </button>
+        <button id="nav-analytics" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          Analytics Graphs
+        </button>
+        <button id="nav-revenue" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Revenue Reports
+        </button>
+        <button id="nav-settings" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Settings
+        </button>
+        <button id="nav-preregistrations" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+          Pre-Registrations
+          <span id="badge-prereg" class="ml-auto text-xs bg-red-500 text-white px-2 py-0.5 rounded-full hidden">0</span>
+        </button>
+        <button id="nav-support" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"></path></svg>
+          Support Tickets
+          <span id="badge-support" class="ml-auto text-xs bg-red-500 text-white px-2 py-0.5 rounded-full hidden">0</span>
+        </button>
+      </div>
+
+      <!-- Settings / Admin Info -->
+      <div class="mt-auto pt-4 border-t border-brand-panelBorder flex flex-col gap-4">
+        <p class="text-xs text-gray-500 truncate px-2 text-center" title="Logged in as">👤 <span id="admin-email" class="text-brand-gold font-medium"></span></p>
+        
+        <div class="flex items-center justify-between bg-black/30 px-3 py-2 rounded-lg border border-brand-panelBorder" title="Enable Payment screens on iOS">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">iOS Features</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="toggle-ios-features" class="sr-only peer">
+            <div class="w-7 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-500"></div>
+          </label>
+        </div>
+        
+        <div class="flex gap-2">
+          <button id="theme-toggle" class="flex-1 py-2 flex justify-center border border-brand-panelBorder rounded-lg hover:bg-black/10 text-gray-500 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+          </button>
+          <button id="logout-btn" class="flex-1 py-2 flex justify-center border border-red-500/30 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 min-w-0 h-full overflow-y-auto pr-2 pb-20 flex flex-col gap-6 custom-scrollbar">
+      
+      <!-- Users View -->
+      <div id="view-users" class="flex flex-col gap-6 fade-in">
+        
+        <!-- Users Filter Toolbar -->
+        <div class="glass-panel rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div class="flex gap-2 w-full sm:w-auto">
+            <select id="filter-status" class="px-3 py-2 bg-black/50 border border-brand-panelBorder rounded-lg focus:border-brand-gold text-sm text-gray-400 outline-none">
+              <option value="all">All Users</option>
+              <option value="online">Online (Today)</option>
+              <option value="offline">Offline (Today)</option>
+              <option value="banned">Banned</option>
+            </select>
+            <button id="export-csv-btn" class="p-2 border border-brand-gold/50 rounded-lg hover:bg-brand-gold/10 text-brand-gold transition-colors" title="Export CSV">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            </button>
+            <button id="btn-global-reset-xp" class="px-3 py-2 border border-brand-gold/50 rounded-lg hover:bg-brand-gold/10 text-brand-gold text-sm font-bold transition-colors">Reset Global XP</button>
+            <button id="btn-global-reset-rank" class="px-3 py-2 border border-red-500/50 rounded-lg hover:bg-red-500/10 text-red-500 text-sm font-bold transition-colors">Reset Rankings</button>
+          </div>
+          <div class="relative w-full sm:max-w-md flex-1">
+            <input type="text" id="search-input" placeholder="Search name or email..." class="w-full px-4 py-2 bg-black/50 border border-brand-panelBorder rounded-lg focus:border-brand-gold text-sm text-white outline-none">
+            <svg class="w-4 h-4 text-gray-500 absolute right-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+          <button id="btn-open-create-account" class="px-4 py-2 bg-brand-gold text-black rounded-lg hover:bg-yellow-500 font-bold transition-colors whitespace-nowrap shadow-lg">
+            + Create Account
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+          <!-- Users List (Left Column) -->
+          <div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-3">
+            <h2 class="text-sm font-semibold text-gray-500 flex justify-between items-center uppercase tracking-wider px-1">
+              <span id="users-view-title">Registered Students</span>
+              <span id="user-count" class="text-xs bg-brand-gold text-black px-2 py-0.5 rounded-full font-bold">0</span>
+            </h2>
+            <div id="users-list" class="glass-panel rounded-2xl overflow-y-auto h-[60vh] lg:h-[calc(100vh-16rem)] flex flex-col gap-1.5 p-2">
+              <div class="flex justify-center p-8"><div class="spinner"></div></div>
+            </div>
+          </div>
+
+          <!-- User Details (Right Columns) -->
+          <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-6">
+            <div id="no-user-selected" class="glass-panel rounded-2xl h-full flex flex-col items-center justify-center p-12 text-center text-gray-400 border-dashed border border-brand-panelBorder min-h-[400px]">
+              <svg class="w-12 h-12 mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+              <p class="text-sm">Select a user to view and manage their access</p>
+            </div>
+
+            <div id="active-user-panel" class="hidden flex-col gap-5">
+              <!-- Profile Card -->
+              <div class="glass-panel rounded-2xl p-6 relative">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div>
+                    <h2 class="text-2xl font-bold text-white mb-1 flex items-center gap-2">
+                      <span id="active-name">User Name</span>
+                      <button onclick="copyToClipboard('active-name')" class="text-gray-500 hover:text-white transition-colors" title="Copy Name"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
+                    </h2>
+                    <div class="flex items-center gap-2 text-sm text-gray-500">
+                      <span id="active-email">email@example.com</span>
+                      <button onclick="copyToClipboard('active-email')" class="text-gray-500 hover:text-white transition-colors mr-2" title="Copy Email"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
+                      <span class="text-xs px-2 py-0.5 bg-gray-500/20 rounded text-gray-400 uppercase tracking-wide" id="active-role">ROLE</span>
+                    </div>
+                    <div id="session-info" class="mt-3 text-xs text-gray-400 flex items-center gap-2 font-medium"></div>
+                    
+                    <!-- XP Simulator for Testing -->
+                    <div class="mt-4 flex items-center gap-3 bg-black/30 p-2 rounded-lg border border-brand-panelBorder/50 w-fit">
+                      <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                      <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">XP Rank:</span>
+                      <input type="number" id="edit-xp-input" class="w-24 px-2 py-1 bg-black/50 border border-brand-panelBorder rounded focus:border-brand-gold text-sm text-white outline-none" min="0" placeholder="e.g. 5000">
+                      <button id="btn-save-xp" class="px-3 py-1 bg-brand-gold hover:bg-yellow-500 text-black font-bold rounded transition-colors text-xs shadow-lg">
+                        Set XP
+                      </button>
+                    </div>
+
+                  </div>
+                  <div class="flex flex-wrap items-center justify-end gap-3 w-full sm:w-auto mt-4 sm:mt-0 bg-black/20 p-2 rounded-xl border border-brand-panelBorder/30">
+                    <button id="btn-ban-user" class="group flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-all text-sm font-bold w-full sm:w-auto justify-center shadow-lg shadow-orange-900/30">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                      Ban User
+                    </button>
+                    <button id="btn-reset-session" class="group flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all text-sm font-bold w-full sm:w-auto justify-center shadow-lg shadow-red-900/30">
+                      <svg class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                      Reset Session
+                    </button>
+                    <button id="btn-delete-account" class="group flex items-center gap-2 px-4 py-2 bg-red-800 hover:bg-red-900 text-white rounded-lg transition-all text-sm font-bold w-full sm:w-auto justify-center shadow-lg shadow-red-900/50">
+                      <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Creator Stats Panel (Hidden by default) -->
+              <div id="creator-stats-panel" class="hidden glass-panel rounded-2xl p-6 border border-purple-500/30">
+                <h3 class="text-sm font-semibold text-purple-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  Creator Financial Stats
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div class="bg-black/40 p-3 rounded-lg border border-brand-panelBorder">
+                    <div class="text-xs text-gray-500 uppercase">Gross Sales</div>
+                    <div class="text-xl font-bold text-white" id="creator-stat-gross">₱0</div>
+                  </div>
+                  <div class="bg-black/40 p-3 rounded-lg border border-purple-500/30">
+                    <div class="text-xs text-purple-400 uppercase font-bold">Creator Net Income</div>
+                    <div class="text-xl font-bold text-purple-400" id="creator-stat-net">₱0</div>
+                  </div>
+                  <div class="bg-black/40 p-3 rounded-lg border border-brand-gold/30">
+                    <div class="text-xs text-brand-gold uppercase font-bold">Admin Commission</div>
+                    <div class="text-xl font-bold text-brand-gold" id="creator-stat-admin">₱0</div>
+                  </div>
+                  <div class="bg-black/40 p-3 rounded-lg border border-brand-panelBorder">
+                    <div class="text-xs text-gray-500 uppercase">Items Sold</div>
+                    <div class="text-xl font-bold text-white" id="creator-stat-items">0</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modules Card -->
+              <div id="modules-card" class="glass-panel rounded-2xl p-6">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-gold"></span> Regular Courses
+                </h3>
+                <div id="enrollment-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+              </div>
+
+              <!-- Mock Boards Card -->
+              <div id="mockboards-card" class="glass-panel rounded-2xl p-6">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Mock Boards
+                </h3>
+                <div id="mockboard-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+              </div>
+
+              <!-- Creator Content Card -->
+              <div id="creator-purchases-card" class="glass-panel rounded-2xl p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                  <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> Creator Purchases (PDFs/Videos)
+                  </h3>
+                  <div class="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-lg border border-brand-panelBorder">
+                    <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Enable Marketplace</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" id="toggle-marketplace" class="sr-only peer">
+                      <div class="w-8 h-4 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-purple-500"></div>
+                    </label>
+                  </div>
+                </div>
+                <div id="creator-purchases-list" class="flex flex-col gap-2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Analytics View (Graphs) -->
+      <div id="view-analytics" class="hidden flex-col gap-6 fade-in">
+        <h2 class="text-2xl font-bold text-white tracking-tight flex items-center gap-2 mb-2">
+          <svg class="w-6 h-6 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          Platform Analytics
+        </h2>
+        
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="glass-panel rounded-3xl p-6 text-center border-t-4 border-t-purple-500 bg-black/40 shadow-lg relative overflow-hidden">
+            <div class="absolute -right-5 -top-5 w-20 h-20 bg-purple-500/10 rounded-full blur-xl pointer-events-none"></div>
+            <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Total Registered Users</h3>
+            <div id="chart-total-users" class="text-4xl font-bold text-white drop-shadow">0</div>
+          </div>
+          <div class="glass-panel rounded-3xl p-6 text-center border-t-4 border-t-blue-500 bg-black/40 shadow-lg relative overflow-hidden">
+            <div class="absolute -right-5 -top-5 w-20 h-20 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
+            <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Active This Month</h3>
+            <div id="chart-active-month" class="text-4xl font-bold text-white drop-shadow">0</div>
+          </div>
+          <div class="glass-panel rounded-3xl p-6 text-center border-t-4 border-t-green-500 bg-black/40 shadow-lg relative overflow-hidden">
+            <div class="absolute -right-5 -top-5 w-20 h-20 bg-green-500/10 rounded-full blur-xl pointer-events-none"></div>
+            <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Active Today</h3>
+            <div id="chart-active-today" class="text-4xl font-bold text-white drop-shadow">0</div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Activity Distribution Chart -->
+          <div class="glass-panel rounded-3xl p-6 border border-brand-panelBorder bg-black/40 shadow-lg">
+            <h3 class="text-white font-bold mb-4">User Activity (Last Login Distribution)</h3>
+            <div class="relative h-64 w-full">
+              <canvas id="activityChart"></canvas>
+            </div>
+          </div>
+          
+          <!-- Banned vs Active Chart -->
+          <div class="glass-panel rounded-3xl p-6 border border-brand-panelBorder bg-black/40 shadow-lg">
+            <h3 class="text-white font-bold mb-4">Account Status</h3>
+            <div class="relative h-64 w-full flex justify-center">
+              <canvas id="statusChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- Revenue View (Categorized) -->
+      <div id="view-revenue" class="hidden flex-col gap-6 fade-in">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-2">
+          <h2 class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <svg class="w-6 h-6 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Revenue Tracking
+          </h2>
+          <div class="text-xl font-bold text-brand-gold bg-brand-gold/10 px-6 py-3 rounded-2xl border border-brand-gold/20 shadow-lg flex flex-col md:items-end">
+            <span class="text-[10px] uppercase tracking-widest text-brand-gold/70 leading-none">Grand Total Income</span>
+            <span id="rev-grand-total">₱0</span>
+          </div>
+        </div>
+
+        <!-- Category Toggles -->
+        <div class="flex gap-2 p-1.5 bg-black/40 rounded-xl border border-brand-panelBorder w-fit overflow-x-auto max-w-full">
+          <button id="rev-tab-regular" class="whitespace-nowrap px-6 py-2.5 rounded-lg font-bold text-sm transition-all bg-brand-gold text-black shadow-md">Regular Courses</button>
+          <button id="rev-tab-mock" class="whitespace-nowrap px-6 py-2.5 rounded-lg font-bold text-sm transition-all text-gray-400 hover:text-white hover:bg-white/5">Mock Boards</button>
+          <button id="rev-tab-content" class="whitespace-nowrap px-6 py-2.5 rounded-lg font-bold text-sm transition-all text-gray-400 hover:text-white hover:bg-white/5">Creator Content</button>
+        </div>
+
+        <!-- Regular Courses View -->
+        <div id="rev-view-regular" class="glass-panel rounded-3xl p-6 border border-brand-panelBorder shadow-xl bg-black/40 fade-in">
+          <div class="flex justify-between items-center mb-8 border-b border-brand-panelBorder/50 pb-4">
+            <div>
+              <h3 class="text-xl font-bold text-white flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand-gold shadow-[0_0_10px_rgba(212,175,55,0.8)]"></span> Regular Courses Revenue</h3>
+              <p class="text-xs text-gray-400 mt-1">Calculated from enrolled students (₱5,000 per subject)</p>
+            </div>
+            <div class="text-3xl font-black text-brand-gold" id="rev-reg-total">₱0</div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="rev-reg-breakdown">
+            <div class="text-gray-500 text-sm text-center col-span-full py-8"><div class="spinner mx-auto border-brand-gold"></div></div>
+          </div>
+        </div>
+
+        <!-- Mock Boards View -->
+        <div id="rev-view-mock" class="hidden glass-panel rounded-3xl p-6 border border-brand-panelBorder shadow-xl bg-black/40 fade-in">
+          <div class="flex justify-between items-center mb-8 border-b border-brand-panelBorder/50 pb-4">
+            <div>
+              <h3 class="text-xl font-bold text-white flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span> Mock Boards Revenue</h3>
+              <p class="text-xs text-gray-400 mt-1">Calculated from enrolled students (₱2,600 per board)</p>
+            </div>
+            <div class="text-3xl font-black text-blue-400" id="rev-mock-total">₱0</div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6" id="rev-mock-breakdown"></div>
+        </div>
+
+        <!-- Creator Content View -->
+        <div id="rev-view-content" class="hidden glass-panel rounded-3xl p-6 border border-brand-panelBorder shadow-xl bg-black/40 fade-in">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-6 gap-4 border-b border-brand-panelBorder/50 pb-4">
+            <div>
+              <h3 class="text-xl font-bold text-white flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]"></span> Creator Purchases</h3>
+              <p class="text-xs text-gray-400 mt-1">Detailed list of verified transactions. Platform takes a 60% commission.</p>
+            </div>
+            <div class="text-right">
+              <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1"><span id="rev-content-count">0</span> Transactions</div>
+              <div class="flex gap-4 items-end justify-end">
+                <div class="text-right">
+                  <div class="text-[10px] text-gray-400 font-bold uppercase">Gross Total</div>
+                  <div class="text-xl font-bold text-gray-300" id="rev-content-gross">₱0</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] text-brand-gold font-bold uppercase">Admin Commission (60%)</div>
+                  <div class="text-3xl font-black text-brand-gold drop-shadow-[0_0_10px_rgba(212,175,55,0.5)]" id="rev-content-admin">₱0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="overflow-x-auto rounded-xl border border-brand-panelBorder/50">
+            <table class="w-full text-left text-sm text-gray-400">
+              <thead class="text-xs text-gray-300 uppercase bg-black/60">
+                <tr>
+                  <th scope="col" class="px-5 py-4 font-semibold">Item Title</th>
+                  <th scope="col" class="px-5 py-4 font-semibold">Student Info</th>
+                  <th scope="col" class="px-5 py-4 font-semibold">Date</th>
+                  <th scope="col" class="px-5 py-4 font-semibold">Type</th>
+                  <th scope="col" class="px-5 py-4 font-semibold text-right">Price</th>
+                </tr>
+              </thead>
+              <tbody id="rev-content-table" class="divide-y divide-brand-panelBorder/50 bg-black/20">
+                <tr><td colspan="5" class="px-5 py-12 text-center"><div class="spinner mx-auto border-purple-500"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Settings View -->
+      <div id="view-settings" class="hidden flex-col gap-6 fade-in">
+        <h2 class="text-2xl font-bold text-white tracking-tight flex items-center gap-2 mb-2">
+          <svg class="w-6 h-6 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Platform Settings
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-5xl">
+          <!-- Main Settings Column -->
+          <div class="glass-panel rounded-3xl p-5 border border-brand-panelBorder bg-black/40 shadow-lg flex flex-col gap-4">
+            <div class="flex justify-between items-center gap-2 border-b border-brand-panelBorder/50 pb-4">
+              <div>
+                <h3 class="text-base font-bold text-white flex items-center gap-1">Maintenance Mode</h3>
+                <p class="text-xs text-gray-400">Show a maintenance screen to all users.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="toggle-maintenance" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-500"></div>
+              </label>
+            </div>
+            
+            <div class="flex justify-between items-center gap-2 border-b border-brand-panelBorder/50 pb-4">
+              <div>
+                <h3 class="text-base font-bold text-white flex items-center gap-1">Disable Registrations</h3>
+                <p class="text-xs text-gray-400">Prevent new users from creating an account.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="toggle-registration" class="sr-only peer" checked>
+                <div class="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500"></div>
+              </label>
+            </div>
+
+            <div class="flex justify-between items-center gap-2">
+              <div>
+                <h3 class="text-base font-bold text-white flex items-center gap-1">Force App Update</h3>
+                <p class="text-xs text-gray-400">Force users to update to the latest version.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="toggle-force-update" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Announcement Column -->
+          <div class="glass-panel rounded-3xl p-5 border border-brand-panelBorder bg-black/40 shadow-lg flex flex-col">
+            <h3 class="text-base font-bold text-white flex items-center gap-1 mb-1">Global Announcement</h3>
+            <p class="text-xs text-gray-400 mb-3">Send an in-app alert to ALL active users.</p>
+            
+            <input type="text" id="announcement-title" placeholder="Title" class="w-full px-3 py-1.5 text-sm bg-black/50 border border-brand-panelBorder rounded-lg focus:border-brand-gold text-white outline-none mb-2">
+            <textarea id="announcement-body" rows="3" placeholder="Message..." class="w-full px-3 py-1.5 text-sm bg-black/50 border border-brand-panelBorder rounded-lg focus:border-brand-gold text-white outline-none mb-3 resize-none"></textarea>
+            
+            <button id="btn-send-announcement" class="mt-auto w-full bg-brand-gold text-black font-bold py-2 rounded-lg hover:bg-yellow-500 transition-colors shadow-lg text-sm">
+              Broadcast Message
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pre-Registrations View -->
+      <div id="view-preregistrations" class="hidden flex-col gap-6 fade-in">
+        <div class="glass-panel rounded-2xl p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-white">Pre-Registrations</h2>
+            <span id="prereg-count" class="bg-brand-gold text-black px-3 py-1 rounded-full text-sm font-bold">0</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-brand-panelBorder text-gray-400 text-sm">
+                  <th class="py-3 px-4">Date</th>
+                  <th class="py-3 px-4">Name</th>
+                  <th class="py-3 px-4">Contact</th>
+                  <th class="py-3 px-4">Subjects</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="prereg-list" class="text-sm text-gray-300">
+                <!-- Data injected here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Support Tickets View -->
+      <div id="view-support" class="hidden flex-col gap-6 fade-in">
+        <div class="glass-panel rounded-2xl p-6">
+          <div class="mb-8">
+            <h1 class="text-4xl font-extrabold text-white tracking-wide mb-2">Support Tickets</h1>
+            <p class="text-gray-400">Monitor and manage student inquiries from the app.</p>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-4 mb-8">
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center shadow-lg">
+              <span class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Total</span>
+              <span id="metric-total" class="text-3xl font-black text-brand-gold">0</span>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center shadow-lg">
+              <span class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">In Progress</span>
+              <span id="metric-progress" class="text-3xl font-black text-blue-400">0</span>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center shadow-lg">
+              <span class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Resolved</span>
+              <span id="metric-resolved" class="text-3xl font-black text-green-400">0</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="support-list">
+            <!-- Data injected here -->
+          </div>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- Create Account Modal -->
+  <div id="modal-create-account" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel rounded-2xl w-full max-w-md p-8 relative overflow-hidden shadow-2xl border border-brand-gold/40" style="background: linear-gradient(to bottom, #111, #000);">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+      
+      <div class="flex justify-between items-center mb-8 relative z-10 border-b border-white/10 pb-4">
+        <h2 class="text-2xl font-bold text-white tracking-wide">Create Account</h2>
+        <button id="btn-close-create-account" class="text-gray-400 hover:text-white transition-colors p-1 bg-white/5 rounded-full hover:bg-red-500 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <form id="form-create-account" class="space-y-5 relative z-10">
+        <div>
+          <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Full Name</label>
+          <input type="text" id="create-fullname" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-brand-gold focus:bg-white/10 text-white font-medium outline-none transition-all" required>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Email</label>
+          <input type="email" id="create-email" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-brand-gold focus:bg-white/10 text-white font-medium outline-none transition-all" required>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Temporary Password</label>
+          <input type="text" id="create-password" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-brand-gold focus:bg-white/10 text-white font-medium outline-none transition-all" value="P@ssw0rd123" required>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Account Role</label>
+          <select id="create-role" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-brand-gold focus:bg-white/10 text-white font-medium outline-none transition-all cursor-pointer">
+            <option value="student" class="bg-black text-white">Student</option>
+            <option value="contentCreator" class="bg-black text-white">Content Creator (Teacher)</option>
+          </select>
+        </div>
+        
+        <button type="submit" id="btn-submit-create-account" class="w-full mt-6 bg-brand-gold text-black font-bold text-lg py-3 rounded-xl hover:bg-yellow-400 transition-colors shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+          Create User
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= JAVASCRIPT ================= -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRGnnMMe2UyLVxWmmB9oa3SoThtQ3T5UA",
+      authDomain: "undergrounds-review-center-app.firebaseapp.com",
+      projectId: "undergrounds-review-center-app",
+      storageBucket: "undergrounds-review-center-app.firebasestorage.app",
+      messagingSenderId: "535962277932",
+      appId: "1:535962277932:web:206ad111e7c38fdc2e5989",
+      measurementId: "G-XELE87G7P4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const modulesList = ['ee', 'esas', 'math', 'refresher'];
+    const mockBoardsList = ['ee', 'esas', 'math'];
+    let allUsers = [];
+    let currentDisplayedUsers = [];
+    let currentActiveUserId = null;
+    let currentActiveUserData = null;
+
+    // Elements
+    const loginSection = document.getElementById('login-section');
+    const dashboardSection = document.getElementById('dashboard-section');
+    const usersListEl = document.getElementById('users-list');
+    const searchInput = document.getElementById('search-input');
+    const panelNoUser = document.getElementById('no-user-selected');
+    const panelActiveUser = document.getElementById('active-user-panel');
+    const themeToggle = document.getElementById('theme-toggle');
+
+    const navUsers = document.getElementById('nav-users');
+    const navCreators = document.getElementById('nav-creators');
+    const navAnalytics = document.getElementById('nav-analytics');
+    const navRevenue = document.getElementById('nav-revenue');
+    const navSettings = document.getElementById('nav-settings');
+    const navPrereg = document.getElementById('nav-preregistrations');
+    const navSupport = document.getElementById('nav-support');
+    
+    const viewUsers = document.getElementById('view-users');
+    const viewAnalytics = document.getElementById('view-analytics');
+    const viewRevenue = document.getElementById('view-revenue');
+    const viewSettings = document.getElementById('view-settings');
+    const viewPrereg = document.getElementById('view-preregistrations');
+    const viewSupport = document.getElementById('view-support');
+
+    const activeNavClass = "nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-bold text-brand-gold bg-brand-gold/10 border border-brand-gold/20";
+    const inactiveNavClass = "nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-transparent";
+
+    let currentViewRole = 'student';
+
+    function resetViews() {
+      navUsers.className = inactiveNavClass;
+      navCreators.className = inactiveNavClass;
+      navAnalytics.className = inactiveNavClass;
+      navRevenue.className = inactiveNavClass;
+      navSettings.className = inactiveNavClass;
+      navPrereg.className = inactiveNavClass;
+      navSupport.className = inactiveNavClass;
+      
+      viewUsers.classList.add('hidden');
+      viewUsers.classList.remove('flex');
+      viewAnalytics.classList.add('hidden');
+      viewAnalytics.classList.remove('flex');
+      viewRevenue.classList.add('hidden');
+      viewRevenue.classList.remove('flex');
+      viewSettings.classList.add('hidden');
+      viewSettings.classList.remove('flex');
+      viewPrereg.classList.add('hidden');
+      viewPrereg.classList.remove('flex');
+      viewSupport.classList.add('hidden');
+      viewSupport.classList.remove('flex');
+    }
+
+    navPrereg.addEventListener('click', () => {
+      resetViews();
+      navPrereg.className = activeNavClass;
+      viewPrereg.classList.remove('hidden');
+      viewPrereg.classList.add('flex');
+    });
+
+    navSupport.addEventListener('click', () => {
+      resetViews();
+      navSupport.className = activeNavClass;
+      viewSupport.classList.remove('hidden');
+      viewSupport.classList.add('flex');
+    });
+
+    navSettings.addEventListener('click', () => {
+      resetViews();
+      navSettings.className = activeNavClass;
+      viewSettings.classList.remove('hidden');
+      viewSettings.classList.add('flex');
+    });
+
+    navUsers.addEventListener('click', () => {
+      resetViews();
+      navUsers.className = activeNavClass;
+      viewUsers.classList.remove('hidden');
+      viewUsers.classList.add('flex');
+      currentViewRole = 'student';
+      document.getElementById('users-view-title').innerText = 'Registered Students';
+      
+      panelActiveUser.classList.add('hidden');
+      panelActiveUser.classList.remove('flex');
+      panelNoUser.classList.remove('hidden');
+      currentActiveUserId = null;
+      document.getElementById('btn-global-reset-xp').classList.remove('hidden');
+      document.getElementById('btn-global-reset-rank').classList.remove('hidden');
+      
+      filterUsers();
+    });
+
+    navCreators.addEventListener('click', () => {
+      resetViews();
+      navCreators.className = activeNavClass;
+      viewUsers.classList.remove('hidden');
+      viewUsers.classList.add('flex');
+      currentViewRole = 'contentCreator';
+      document.getElementById('users-view-title').innerText = 'Content Creators';
+      
+      panelActiveUser.classList.add('hidden');
+      panelActiveUser.classList.remove('flex');
+      panelNoUser.classList.remove('hidden');
+      currentActiveUserId = null;
+      document.getElementById('btn-global-reset-xp').classList.add('hidden');
+      document.getElementById('btn-global-reset-rank').classList.add('hidden');
+      
+      filterUsers();
+    });
+
+    navAnalytics.addEventListener('click', () => {
+      resetViews();
+      navAnalytics.className = activeNavClass;
+      viewAnalytics.classList.remove('hidden');
+      viewAnalytics.classList.add('flex');
+      loadAnalytics();
+    });
+
+    navRevenue.addEventListener('click', () => {
+      resetViews();
+      navRevenue.className = activeNavClass;
+      viewRevenue.classList.remove('hidden');
+      viewRevenue.classList.add('flex');
+      loadRevenue();
+    });
+
+    // --- Revenue Tabs Logic ---
+    const revTabReg = document.getElementById('rev-tab-regular');
+    const revTabMock = document.getElementById('rev-tab-mock');
+    const revTabContent = document.getElementById('rev-tab-content');
+    
+    const revViewReg = document.getElementById('rev-view-regular');
+    const revViewMock = document.getElementById('rev-view-mock');
+    const revViewContent = document.getElementById('rev-view-content');
+
+    const activeRevTabClass = "whitespace-nowrap px-6 py-2.5 rounded-lg font-bold text-sm transition-all bg-brand-gold text-black shadow-md";
+    const inactiveRevTabClass = "whitespace-nowrap px-6 py-2.5 rounded-lg font-bold text-sm transition-all text-gray-400 hover:text-white hover:bg-white/5";
+
+    function resetRevTabs() {
+      revTabReg.className = inactiveRevTabClass;
+      revTabMock.className = inactiveRevTabClass;
+      revTabContent.className = inactiveRevTabClass;
+      
+      revViewReg.classList.add('hidden');
+      revViewMock.classList.add('hidden');
+      revViewContent.classList.add('hidden');
+    }
+
+    revTabReg.addEventListener('click', () => {
+      resetRevTabs();
+      revTabReg.className = activeRevTabClass;
+      revViewReg.classList.remove('hidden');
+    });
+
+    revTabMock.addEventListener('click', () => {
+      resetRevTabs();
+      revTabMock.className = activeRevTabClass;
+      revViewMock.classList.remove('hidden');
+    });
+
+    revTabContent.addEventListener('click', () => {
+      resetRevTabs();
+      revTabContent.className = activeRevTabClass;
+      revViewContent.classList.remove('hidden');
+    });
+
+    // --- Analytics Logic ---
+    const PRICING = {
+      regular: 5000,
+      mockBoard: 2600
+    };
+
+    // --- Chart Instance Tracking ---
+    let activityChartInstance = null;
+    let statusChartInstance = null;
+
+    async function loadAnalytics() {
+      const now = new Date();
+      let activeToday = 0;
+      let activeMonth = 0;
+      
+      let activityData = { today: 0, yesterday: 0, thisWeek: 0, thisMonth: 0, older: 0 };
+      let statusData = { active: 0, banned: 0 };
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterdayStart = new Date(todayStart);
+      yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+      const weekStart = new Date(todayStart);
+      weekStart.setDate(weekStart.getDate() - 7);
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      allUsers.forEach(u => {
+        // Status Check
+        const { isBanned } = checkBanStatus(u);
+        if (isBanned) statusData.banned++;
+        else statusData.active++;
+
+        // Activity Check
+        if (u.activeSessionTimestamp) {
+          const date = u.activeSessionTimestamp.toDate ? u.activeSessionTimestamp.toDate() : new Date(u.activeSessionTimestamp.seconds * 1000);
+          
+          if (date >= todayStart) {
+            activeToday++;
+            activeMonth++;
+            activityData.today++;
+          } else if (date >= yesterdayStart) {
+            activeMonth++;
+            activityData.yesterday++;
+          } else if (date >= weekStart) {
+            activeMonth++;
+            activityData.thisWeek++;
+          } else if (date >= monthStart) {
+            activeMonth++;
+            activityData.thisMonth++;
+          } else {
+            activityData.older++;
+          }
+        } else {
+          activityData.older++;
+        }
+      });
+      
+      document.getElementById('chart-total-users').innerText = allUsers.length;
+      document.getElementById('chart-active-today').innerText = activeToday;
+      document.getElementById('chart-active-month').innerText = activeMonth;
+
+      renderCharts(activityData, statusData);
+    }
+
+    function renderCharts(activityData, statusData) {
+      if (activityChartInstance) activityChartInstance.destroy();
+      if (statusChartInstance) statusChartInstance.destroy();
+
+      const ctxActivity = document.getElementById('activityChart').getContext('2d');
+      activityChartInstance = new Chart(ctxActivity, {
+        type: 'bar',
+        data: {
+          labels: ['Today', 'Yesterday', 'Last 7 Days', 'This Month', 'Older/Never'],
+          datasets: [{
+            label: 'Users by Last Login',
+            data: [activityData.today, activityData.yesterday, activityData.thisWeek, activityData.thisMonth, activityData.older],
+            backgroundColor: 'rgba(212, 175, 55, 0.6)',
+            borderColor: 'rgba(212, 175, 55, 1)',
+            borderWidth: 1,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#9ca3af' } },
+            x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+          }
+        }
+      });
+
+      const ctxStatus = document.getElementById('statusChart').getContext('2d');
+      statusChartInstance = new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+          labels: ['Active', 'Banned'],
+          datasets: [{
+            data: [statusData.active, statusData.banned],
+            backgroundColor: ['rgba(34, 197, 94, 0.6)', 'rgba(239, 68, 68, 0.6)'],
+            borderColor: ['rgba(34, 197, 94, 1)', 'rgba(239, 68, 68, 1)'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#9ca3af' } }
+          }
+        }
+      });
+    }
+
+    async function loadRevenue() {
+      try {
+        const paymentPromises = allUsers.map(u => db.collection('users').doc(u.id).collection('paymentStatus').doc('status').get().catch(() => null));
+        const paymentDocs = await Promise.all(paymentPromises);
+        
+        let counts = {
+          reg: { ee: 0, math: 0, esas: 0, refresher: 0 },
+          mock: { ee: 0, math: 0, esas: 0 }
+        };
+
+        paymentDocs.forEach(doc => {
+          if (doc && doc.exists) {
+            const data = doc.data();
+            if (data.eePaid) counts.reg.ee++;
+            if (data.mathPaid) counts.reg.math++;
+            if (data.esasPaid) counts.reg.esas++;
+            if (data.refresherPaid) counts.reg.refresher++;
+
+            if (data.eeMockBoardPaid) counts.mock.ee++;
+            if (data.mathMockBoardPaid) counts.mock.math++;
+            if (data.esasMockBoardPaid) counts.mock.esas++;
+          }
+        });
+
+        let regTotal = 0;
+        let regHtml = '';
+        for (const [subj, count] of Object.entries(counts.reg)) {
+          const revenue = count * PRICING.regular;
+          regTotal += revenue;
+          regHtml += `
+            <div class="bg-black/30 p-4 rounded-2xl border border-brand-panelBorder/50 flex flex-col items-center justify-center text-center hover:border-brand-gold/50 transition-colors">
+              <span class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">${subj}</span>
+              <span class="text-2xl font-black text-brand-gold mb-1">₱${revenue.toLocaleString()}</span>
+              <span class="text-sm font-medium text-white">${count} Students</span>
+            </div>
+          `;
+        }
+        document.getElementById('rev-reg-total').innerText = '₱' + regTotal.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('rev-reg-breakdown').innerHTML = regHtml;
+
+        let mockTotal = 0;
+        let mockHtml = '';
+        for (const [subj, count] of Object.entries(counts.mock)) {
+          const revenue = count * PRICING.mockBoard;
+          mockTotal += revenue;
+          mockHtml += `
+            <div class="bg-black/30 p-4 rounded-2xl border border-brand-panelBorder/50 flex flex-col items-center justify-center text-center hover:border-blue-500/50 transition-colors">
+              <span class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">${subj} Mock</span>
+              <span class="text-2xl font-black text-blue-400 mb-1">₱${revenue.toLocaleString()}</span>
+              <span class="text-sm font-medium text-white">${count} Students</span>
+            </div>
+          `;
+        }
+        document.getElementById('rev-mock-total').innerText = '₱' + mockTotal.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('rev-mock-breakdown').innerHTML = mockHtml;
+
+        const tbody = document.getElementById('rev-content-table');
+        tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-12 text-center"><div class="spinner mx-auto border-purple-500"></div></td></tr>';
+        
+        const snap = await db.collection('creator_purchases').get();
+        let creatorTotal = 0;
+        let purchases = [];
+        snap.forEach(doc => {
+          const data = doc.data();
+          if ((data.status || '').toLowerCase() === 'verified') {
+            purchases.push(data);
+          }
+        });
+        
+        purchases.sort((a, b) => {
+          const t1 = a.purchasedAt ? (a.purchasedAt.seconds || 0) : 0;
+          const t2 = b.purchasedAt ? (b.purchasedAt.seconds || 0) : 0;
+          return t2 - t1;
+        });
+
+        let rowsHtml = '';
+        if (purchases.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-8 text-center text-gray-500 text-base">No verified purchases found yet.</td></tr>';
+        } else {
+          purchases.forEach(data => {
+            const price = parseFloat(data.price) || 0;
+            creatorTotal += price;
+            
+            let dateStr = 'Unknown';
+            if (data.purchasedAt) {
+              const d = data.purchasedAt.toDate ? data.purchasedAt.toDate() : new Date(data.purchasedAt.seconds * 1000);
+              dateStr = d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+            
+            const student = allUsers.find(u => u.id === data.studentId);
+            const studentStr = student ? `<div class="font-medium text-gray-200">${student.fullName || 'No Name'}</div><div class="text-xs text-gray-500 mt-0.5">${student.email || ''}</div>` : `<div class="text-xs text-gray-500">ID: ${data.studentId}</div>`;
+
+            rowsHtml += `
+              <tr class="hover:bg-brand-panelBorder/30 transition-colors">
+                <td class="px-5 py-4 font-medium text-white">${data.title || data.contentTitle || 'Unknown Item'}</td>
+                <td class="px-5 py-4">${studentStr}</td>
+                <td class="px-5 py-4 whitespace-nowrap">${dateStr}</td>
+                <td class="px-5 py-4"><span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">${data.type || data.contentType || 'CONTENT'}</span></td>
+                <td class="px-5 py-4 text-right font-bold text-brand-gold text-base">₱${price.toLocaleString()}</td>
+              </tr>
+            `;
+          });
+          tbody.innerHTML = rowsHtml;
+        }
+        
+        const adminCommission = creatorTotal * 0.60;
+        document.getElementById('rev-content-gross').innerText = '₱' + creatorTotal.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('rev-content-admin').innerText = '₱' + adminCommission.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('rev-content-count').innerText = purchases.length;
+
+        const grandTotal = regTotal + mockTotal + adminCommission;
+        document.getElementById('rev-grand-total').innerText = '₱' + grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+      } catch (err) {
+        console.error("Error loading revenue:", err);
+        document.getElementById('rev-content-table').innerHTML = `<tr><td colspan="5" class="px-4 py-4 text-center text-red-500">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    function checkBanStatus(user) {
+      if (!user) return { isBanned: false, expiresAt: null };
+      let banned = user.isBanned === true || (user.securityStatus && user.securityStatus.isBanned === true);
+      let expiresAt = null;
+      
+      if (user.banExpiresAt) {
+        const expireDate = user.banExpiresAt.toDate ? user.banExpiresAt.toDate() : new Date(user.banExpiresAt.seconds * 1000);
+        if (expireDate > new Date()) {
+          banned = true;
+          expiresAt = expireDate;
+        } else if (banned) {
+          banned = false; 
+        }
+      }
+      return { isBanned: banned, expiresAt };
+    }
+
+    let isLightMode = localStorage.getItem('theme') === 'light';
+    if(isLightMode) document.body.classList.add('light-theme');
+    
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-theme');
+      isLightMode = document.body.classList.contains('light-theme');
+      localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+    });
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        loginSection.classList.add('hidden');
+        dashboardSection.classList.remove('hidden');
+        dashboardSection.classList.add('flex');
+        document.getElementById('admin-email').innerText = user.email;
+        loadAllUsers();
+      } else {
+        loginSection.classList.remove('hidden');
+        dashboardSection.classList.add('hidden');
+        dashboardSection.classList.remove('flex');
+      }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const em = document.getElementById('email').value;
+      const pw = document.getElementById('password').value;
+      const btn = document.getElementById('login-btn');
+      btn.innerText = "Authenticating...";
+      
+      auth.signInWithEmailAndPassword(em, pw).catch(err => {
+        document.getElementById('login-error').innerText = err.message;
+        document.getElementById('login-error').classList.remove('hidden');
+        btn.innerText = "Authenticate";
+      });
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+
+    async function loadAllUsers() {
+      try {
+        usersListEl.innerHTML = '<div class="flex justify-center p-8"><div class="spinner"></div></div>';
+        const snapshot = await db.collection('users').get();
+        allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        filterUsers();
+      } catch (error) {
+        usersListEl.innerHTML = `<div class="p-4 text-red-500 text-sm bg-red-500/10 rounded">Error: ${error.message}</div>`;
+      }
+    }
+
+    function renderUsersList(users) {
+      usersListEl.innerHTML = '';
+      if(users.length === 0) {
+        usersListEl.innerHTML = '<div class="p-6 text-center text-gray-500 text-sm">No users found.</div>';
+        return;
+      }
+
+      users.forEach(user => {
+        const div = document.createElement('div');
+        div.className = `p-4 rounded-xl cursor-pointer transition-all border border-transparent hover:bg-brand-gold/10 hover:border-brand-gold/20 flex flex-col gap-1`;
+        div.onclick = () => selectUser(user);
+        
+        div.innerHTML = `
+          <div class="font-semibold text-white text-base truncate flex items-center gap-2">
+            ${user.fullName || 'No Name'}
+            ${user.role === 'admin' ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-red-500/20 text-red-500 font-bold uppercase tracking-wide">Admin</span>' : ''}
+          </div>
+          <div class="text-sm text-gray-400 truncate">${user.email || 'No Email'}</div>
+        `;
+        usersListEl.appendChild(div);
+      });
+    }
+
+    function isToday(timestamp) {
+      if (!timestamp) return false;
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+      const today = new Date();
+      return date.getDate() === today.getDate() &&
+             date.getMonth() === today.getMonth() &&
+             date.getFullYear() === today.getFullYear();
+    }
+
+    function filterUsers() {
+      const term = searchInput.value.toLowerCase();
+      const statusFilter = document.getElementById('filter-status').value;
+      
+      const filtered = allUsers.filter(u => {
+        const uRole = u.role || 'student';
+        if (currentViewRole === 'student' && uRole === 'contentCreator') return false;
+        if (currentViewRole === 'contentCreator' && uRole !== 'contentCreator') return false;
+
+        const matchesSearch = (u.fullName || '').toLowerCase().includes(term) || (u.email || '').toLowerCase().includes(term);
+        if (!matchesSearch) return false;
+        
+        const hasSessionId = u.activeSessionId && u.activeSessionId.trim() !== '';
+        const { isBanned } = checkBanStatus(u);
+        const actedToday = isToday(u.activeSessionTimestamp);
+
+        if (statusFilter === 'online') return hasSessionId && actedToday && !isBanned;
+        if (statusFilter === 'offline') return (!hasSessionId || !actedToday) && !isBanned;
+        if (statusFilter === 'banned') return isBanned;
+        return true; 
+      });
+      document.getElementById('user-count').innerText = filtered.length;
+      currentDisplayedUsers = filtered;
+      renderUsersList(filtered);
+    }
+
+    searchInput.addEventListener('input', filterUsers);
+    document.getElementById('filter-status').addEventListener('change', filterUsers);
+
+    async function selectUser(user) {
+      currentActiveUserId = user.id;
+      currentActiveUserData = user;
+      
+      panelNoUser.classList.add('hidden');
+      panelActiveUser.classList.remove('hidden');
+      panelActiveUser.classList.add('flex');
+      
+      document.getElementById('active-name').innerText = user.fullName || 'No Name';
+      document.getElementById('active-email').innerText = user.email || 'No Email';
+      document.getElementById('active-role').innerText = user.role || 'STUDENT';
+      document.getElementById('edit-xp-input').value = user.xp || 0;
+
+      if (window.innerWidth < 1024) {
+        setTimeout(() => {
+          panelActiveUser.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      }
+
+      const statsPanel = document.getElementById('creator-stats-panel');
+      const coursesPanel = document.getElementById('modules-card');
+      const mockboardsPanel = document.getElementById('mockboards-card');
+      const purchasesPanel = document.getElementById('creator-purchases-card');
+
+      if (user.role === 'contentCreator') {
+        statsPanel.classList.remove('hidden');
+        if (coursesPanel) coursesPanel.classList.add('hidden');
+        if (mockboardsPanel) mockboardsPanel.classList.add('hidden');
+        if (purchasesPanel) purchasesPanel.classList.add('hidden');
+        loadCreatorStats(user.id);
+      } else {
+        statsPanel.classList.add('hidden');
+        if (coursesPanel) coursesPanel.classList.remove('hidden');
+        if (mockboardsPanel) mockboardsPanel.classList.remove('hidden');
+        if (purchasesPanel) purchasesPanel.classList.remove('hidden');
+      }
+
+      const sessionInfoEl = document.getElementById('session-info');
+      const sessionId = user.activeSessionId;
+      const sessionTimestamp = user.activeSessionTimestamp;
+      const activeDevice = user.activeDevice || 'Unknown Device';
+      
+      let timeStr = 'Unknown time';
+      if (sessionTimestamp) {
+        const date = sessionTimestamp.toDate ? sessionTimestamp.toDate() : new Date(sessionTimestamp.seconds * 1000);
+        timeStr = date.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+      }
+
+      if (sessionId && sessionId.trim() !== '') {
+        sessionInfoEl.innerHTML = `
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+          </span>
+          <span class="text-green-400">Online</span>
+          <span class="text-gray-500 ml-1" title="Active Device">• 💻 ${activeDevice}</span>
+          <span class="text-gray-500 ml-1">• Last Login: ${timeStr}</span>
+        `;
+      } else if (sessionTimestamp) {
+        sessionInfoEl.innerHTML = `
+          <span class="w-2.5 h-2.5 rounded-full bg-gray-600"></span>
+          <span class="text-gray-400">Offline</span>
+          <span class="text-gray-600 ml-1" title="Last Known Device">• 💻 ${activeDevice}</span>
+          <span class="text-gray-600 ml-1">• Last Logout: ${timeStr}</span>
+        `;
+      } else {
+        sessionInfoEl.innerHTML = `
+          <span class="w-2.5 h-2.5 rounded-full bg-gray-600"></span>
+          <span class="text-gray-400">Offline</span>
+          <span class="text-gray-600 ml-1">• No session data</span>
+        `;
+      }
+      
+      const { isBanned, expiresAt } = checkBanStatus(user);
+      if (isBanned) {
+        let banText = expiresAt ? `BANNED UNTIL ${expiresAt.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : 'BANNED';
+        sessionInfoEl.innerHTML += ` <span class="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-orange-500/20 text-orange-500 font-bold uppercase tracking-wide border border-orange-500/30" title="Expires: ${expiresAt ? expiresAt.toLocaleString() : 'Permanent'}">${banText}</span>`;
+      }
+      updateBanButtonUI();
+
+      const toggleMarketplace = document.getElementById('toggle-marketplace');
+      const newToggle = toggleMarketplace.cloneNode(true);
+      toggleMarketplace.parentNode.replaceChild(newToggle, toggleMarketplace);
+      
+      newToggle.checked = user.isMarketplaceEnabled === true;
+      newToggle.addEventListener('change', async (e) => {
+        try {
+          await db.collection('users').doc(user.id).update({
+            isMarketplaceEnabled: e.target.checked,
+            adminUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          user.isMarketplaceEnabled = e.target.checked;
+        } catch(err) {
+          alert("Error updating marketplace access: " + err.message);
+          e.target.checked = !e.target.checked; 
+        }
+      });
+
+      loadEnrollments(user.id);
+      renderMockBoards(user);
+      loadCreatorPurchases(user.id);
+    }
+
+    async function loadCreatorStats(creatorId) {
+      document.getElementById('creator-stat-gross').innerText = '₱...';
+      document.getElementById('creator-stat-net').innerText = '₱...';
+      document.getElementById('creator-stat-admin').innerText = '₱...';
+      document.getElementById('creator-stat-items').innerText = '...';
+      
+      try {
+        const snap = await db.collection('creator_purchases').where('creatorId', '==', creatorId).where('status', '==', 'verified').get();
+        let gross = 0;
+        let count = 0;
+        snap.forEach(doc => {
+          const d = doc.data();
+          gross += parseFloat(d.price) || 0;
+          count++;
+        });
+        
+        const adminCommission = gross * 0.60;
+        const netIncome = gross - adminCommission;
+        
+        document.getElementById('creator-stat-gross').innerText = '₱' + gross.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('creator-stat-net').innerText = '₱' + netIncome.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('creator-stat-admin').innerText = '₱' + adminCommission.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('creator-stat-items').innerText = count;
+      } catch (error) {
+        console.error("Failed to load creator stats:", error);
+        document.getElementById('creator-stat-gross').innerText = 'Error';
+      }
+    }
+
+    async function loadEnrollments(userId) {
+      const grid = document.getElementById('enrollment-grid');
+      grid.innerHTML = '<div class="col-span-1 sm:col-span-2 p-4 flex justify-center"><div class="spinner"></div></div>';
+
+      try {
+        const snap = await db.collection('users').doc(userId).collection('enrollments').get();
+        let enrolledMap = {};
+        snap.forEach(doc => { enrolledMap[doc.id] = doc.data().enrolled || false; });
+
+        grid.innerHTML = '';
+        modulesList.forEach(mod => {
+          const isEnrolled = enrolledMap[mod] === true;
+          grid.appendChild(createToggleCard(mod, isEnrolled, async (checked) => {
+            try {
+              const batch = db.batch();
+              
+              const enrollRef = db.collection('users').doc(userId).collection('enrollments').doc(mod);
+              batch.set(enrollRef, { enrolled: checked, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+              
+              const paymentRef = db.collection('users').doc(userId).collection('paymentStatus').doc('status');
+              batch.set(paymentRef, { [`${mod}Paid`]: checked }, { merge: true });
+              
+              const userRef = db.collection('users').doc(userId);
+              batch.update(userRef, { adminUpdatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+              
+              await batch.commit();
+            } catch (e) {
+              alert("Error updating course: " + e.message);
+            }
+          }));
+        });
+      } catch(e) {
+        grid.innerHTML = `<div class="col-span-2 text-red-500 text-sm">Error: ${e.message}</div>`;
+      }
+    }
+
+    async function renderMockBoards(user) {
+      const grid = document.getElementById('mockboard-grid');
+      grid.innerHTML = '<div class="col-span-1 sm:col-span-3 p-4 flex justify-center"><div class="spinner border-blue-500"></div></div>';
+      
+      try {
+        const paymentRef = await db.collection('users').doc(user.id).collection('paymentStatus').doc('status').get();
+        const paymentData = paymentRef.exists ? paymentRef.data() : {};
+
+        grid.innerHTML = '';
+        
+        mockBoardsList.forEach(mod => {
+          const fieldName = `${mod}MockBoardPaid`;
+          const isPaid = paymentData[fieldName] === true;
+          
+          grid.appendChild(createToggleCard(mod, isPaid, async (checked) => {
+            try {
+              const batch = db.batch();
+              
+              const pRef = db.collection('users').doc(user.id).collection('paymentStatus').doc('status');
+              batch.set(pRef, { [fieldName]: checked }, { merge: true });
+              
+              const eRef = db.collection('users').doc(user.id).collection('enrollments').doc(`${mod}_mock_board`);
+              batch.set(eRef, { enrolled: checked, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+              
+              const userRef = db.collection('users').doc(user.id);
+              batch.update(userRef, { adminUpdatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+
+              await batch.commit();
+            } catch(e) {
+              alert("Error updating mock board: " + e.message);
+            }
+          }));
+        });
+      } catch(e) {
+        grid.innerHTML = `<div class="col-span-3 text-red-500 text-sm">Error: ${e.message}</div>`;
+      }
+    }
+
+    async function loadCreatorPurchases(userId) {
+      const list = document.getElementById('creator-purchases-list');
+      list.innerHTML = '<div class="flex justify-center p-4"><div class="spinner"></div></div>';
+
+      try {
+        const snap = await db.collection('creator_purchases').where('studentId', '==', userId).get();
+        if(snap.empty) {
+          list.innerHTML = '<div class="text-sm text-gray-500 italic p-4 text-center">No creator content purchased yet.</div>';
+          return;
+        }
+
+        list.innerHTML = '';
+        snap.forEach(doc => {
+          const data = doc.data();
+          const docId = doc.id;
+          const status = (data.status || 'Pending').toLowerCase();
+          
+          const div = document.createElement('div');
+          div.className = 'bg-black/20 border border-brand-panelBorder rounded-xl p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4';
+          
+          let dateStr = 'Unknown date';
+          if(data.purchasedAt) {
+            dateStr = new Date(data.purchasedAt.seconds * 1000).toLocaleString();
+          }
+
+          let actionHtml = '';
+          if (status === 'pending') {
+            actionHtml = `<button onclick="verifyPurchase('${docId}')" class="mt-3 bg-green-500/20 hover:bg-green-500/30 text-green-500 border border-green-500/30 text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Verify Payment</button>`;
+          }
+
+          div.innerHTML = `
+            <div class="flex-1">
+              <div class="text-base font-bold text-white mb-1">${data.title || data.contentTitle || 'Unknown Item'}</div>
+              <div class="text-sm text-gray-400 mb-2">Creator ID: <span class="text-gray-300 font-mono text-xs">${data.creatorId || 'Unknown'}</span></div>
+              <div class="flex flex-wrap items-center gap-2 mt-1">
+                <span class="uppercase text-xs font-bold tracking-wider text-purple-400 bg-purple-500/10 px-2 py-1 rounded border border-purple-500/20">${data.type || data.contentType || 'CONTENT'}</span>
+                <span class="uppercase text-xs font-bold tracking-wider ${status === 'verified' ? 'text-green-400 bg-green-500/10 border-green-500/20' : 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20'} px-2 py-1 rounded border">${data.status || 'Pending'}</span>
+              </div>
+              ${actionHtml}
+            </div>
+            <div class="sm:text-right flex flex-col sm:justify-center mt-2 sm:mt-0 bg-black/30 p-3 rounded-lg border border-brand-panelBorder/50">
+              <div class="text-gray-400 text-xs uppercase tracking-wider mb-1">Amount</div>
+              <div class="text-brand-gold text-lg font-bold leading-tight">₱${data.price || 0}</div>
+              <div class="text-xs text-gray-500 mt-1">${dateStr}</div>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+
+      } catch(e) {
+        list.innerHTML = `<div class="text-red-500 text-sm">Error: ${e.message}</div>`;
+      }
+    }
+
+    window.verifyPurchase = async function(docId) {
+      if(confirm("Verify this payment? This will notify the Content Creator to grant access.")) {
+        try {
+          await db.collection('creator_purchases').doc(docId).update({
+            status: 'Verified',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          if (currentActiveUserId) {
+            loadCreatorPurchases(currentActiveUserId);
+          }
+        } catch(e) {
+          alert("Failed to verify payment: " + e.message);
+        }
+      }
+    }
+
+    function createToggleCard(title, isActive, onChangeCb) {
+      const card = document.createElement('div');
+      card.className = `p-3 rounded-lg border transition-all flex items-center justify-between ${
+        isActive ? 'bg-brand-gold/5 border-brand-gold/30' : 'bg-black/30 border-brand-panelBorder'
+      }`;
+      
+      const id = 'toggle-' + Math.random().toString(36).substr(2, 9);
+      
+      card.innerHTML = `
+        <div class="flex flex-col">
+          <span class="text-sm font-bold uppercase tracking-wider ${isActive ? 'text-brand-gold' : 'text-gray-400'}">${title}</span>
+          <span class="text-[10px] font-medium mt-0.5 flex items-center gap-1 ${isActive ? 'text-green-500' : 'text-gray-500'}">
+            ${isActive ? 'ACTIVATED' : 'LOCKED'}
+          </span>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="${id}" class="sr-only peer" ${isActive ? 'checked' : ''}>
+          <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-gold"></div>
+        </label>
+      `;
+
+      card.querySelector('input').addEventListener('change', (e) => {
+        const checked = e.target.checked;
+        onChangeCb(checked);
+        card.className = `p-3 rounded-lg border transition-all flex items-center justify-between ${
+          checked ? 'bg-brand-gold/5 border-brand-gold/30' : 'bg-black/30 border-brand-panelBorder'
+        }`;
+        const labelText = card.querySelector('span:nth-child(2)');
+        labelText.className = `text-[10px] font-medium mt-0.5 flex items-center gap-1 ${checked ? 'text-green-500' : 'text-gray-500'}`;
+        labelText.innerText = checked ? 'ACTIVATED' : 'LOCKED';
+        const titleText = card.querySelector('span:first-child');
+        titleText.className = `text-sm font-bold uppercase tracking-wider ${checked ? 'text-brand-gold' : 'text-gray-400'}`;
+      });
+
+      return card;
+    }
+
+    document.getElementById('btn-reset-session').addEventListener('click', async () => {
+      if(!currentActiveUserId) return;
+      if(confirm("Force logout this student from their active device?")) {
+        try {
+          await db.collection('users').doc(currentActiveUserId).update({ activeSessionId: '' });
+          alert("Session reset successfully!");
+        } catch (error) {
+          alert("Reset failed: " + error.message);
+        }
+      }
+    });
+
+    document.getElementById('btn-delete-account').addEventListener('click', async () => {
+      if(!currentActiveUserId) return;
+      
+      const email = currentActiveUserData.email || 'this user';
+      if(confirm(`WARNING: Are you sure you want to PERMANENTLY DELETE ${email}? This action cannot be undone and deletes all their data and Auth account.`)) {
+        if(confirm(`Final confirmation: DELETE ${currentActiveUserData.fullName || 'User'}?`)) {
+          const btn = document.getElementById('btn-delete-account');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; border-top-color: white; border-right-color: white; border-bottom-color: white;"></div> Deleting...';
+          btn.disabled = true;
+
+          try {
+            const deleteFunc = firebase.functions().httpsCallable('deleteCreatorAccount');
+            await deleteFunc({ uid: currentActiveUserId });
+            
+            alert("Account permanently deleted!");
+            
+            panelActiveUser.classList.add('hidden');
+            panelActiveUser.classList.remove('flex');
+            panelNoUser.classList.remove('hidden');
+            currentActiveUserId = null;
+            currentActiveUserData = null;
+            
+            loadAllUsers();
+          } catch (error) {
+            alert("Delete failed: " + error.message);
+          } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }
+        }
+      }
+    });
+
+    document.getElementById('export-csv-btn').addEventListener('click', () => {
+      if(currentDisplayedUsers.length === 0) {
+        alert("No users to export.");
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,Name,Email,Role,Status,Marketplace\n";
+      currentDisplayedUsers.forEach(u => {
+        const name = (u.fullName || 'No Name').replace(/,/g, ''); 
+        const email = u.email || 'No Email';
+        const role = u.role || 'student';
+        const isBanned = u.isBanned === true || (u.securityStatus && u.securityStatus.isBanned === true);
+        const hasSessionId = u.activeSessionId && u.activeSessionId.trim() !== '';
+        const actedToday = u.activeSessionTimestamp ? true : false;
+        const isOnline = hasSessionId && actedToday;
+        const status = isBanned ? 'Banned' : (isOnline ? 'Online' : 'Offline');
+        const mkPlace = u.isMarketplaceEnabled ? 'Enabled' : 'Disabled';
+        csvContent += `"${name}","${email}",${role},${status},${mkPlace}\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Undergrounds_Users_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    document.getElementById('btn-global-reset-xp').addEventListener('click', async () => {
+      if(confirm("WARNING: Are you sure you want to FORCE RESET the Weekly Leaderboard for ALL users? This will zero out their leaderboard points.")) {
+        const btn = document.getElementById('btn-global-reset-xp');
+        const origText = btn.innerText;
+        btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-top-color:currentColor;"></div>';
+        try {
+          const snapshot = await db.collection('leaderboards').get();
+          let batch = db.batch();
+          let count = 0;
+          let total = 0;
+          snapshot.forEach(doc => {
+            batch.update(doc.ref, {
+              averageScore: 0.0,
+              weightedScore: 0.0,
+              completedExams: 0,
+              totalCorrectAnswers: 0,
+              totalQuestionsAnswered: 0,
+              totalTimeSpentSecs: 0
+            });
+            count++;
+            total++;
+            if(count === 400) {
+              batch.commit();
+              batch = db.batch();
+              count = 0;
+            }
+          });
+          if (count > 0) await batch.commit();
+          alert(`Weekly Leaderboard Reset Successfully! (${total} records updated)`);
+        } catch (error) {
+          alert("Reset Failed: " + error.message);
+        } finally {
+          btn.innerText = origText;
+        }
+      }
+    });
+
+    document.getElementById('btn-global-reset-rank').addEventListener('click', async () => {
+      if(confirm("WARNING: Are you sure you want to SIMULATE/TRIGGER the Season Rank Reset? This demotes users 1-2 tiers down based on points.")) {
+        const btn = document.getElementById('btn-global-reset-rank');
+        const origText = btn.innerText;
+        btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-top-color:currentColor;"></div>';
+        try {
+          const snapshot = await db.collection('users').get();
+          let batch = db.batch();
+          let count = 0;
+          let total = 0;
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const currentXp = data.xp || 0;
+            let newXp = currentXp;
+
+            if (currentXp >= 30000) newXp = 15000;
+            else if (currentXp >= 20000) newXp = 10000;
+            else if (currentXp >= 15000) newXp = 10000;
+            else if (currentXp >= 10000) newXp = 5000;
+            else if (currentXp >= 5000) newXp = 2500;
+
+            if (newXp !== currentXp) {
+              batch.update(doc.ref, { xp: newXp });
+              count++;
+              total++;
+            }
+            if(count === 400) {
+              batch.commit();
+              batch = db.batch();
+              count = 0;
+            }
+          });
+          if (count > 0) await batch.commit();
+          alert(`Season Rankings Reset Successfully! (${total} users demoted)`);
+          loadAllUsers(); 
+        } catch (error) {
+          alert("Reset Failed: " + error.message);
+        } finally {
+          btn.innerText = origText;
+        }
+      }
+    });
+
+    window.copyToClipboard = function(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById(elementId).nextElementSibling;
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+        setTimeout(() => { btn.innerHTML = originalHtml; }, 1500);
+      });
+    }
+
+    function updateBanButtonUI() {
+      const btn = document.getElementById('btn-ban-user');
+      if(!currentActiveUserData) return;
+      const { isBanned } = checkBanStatus(currentActiveUserData);
+      if (isBanned) {
+        btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Unban User`;
+        btn.className = "group flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all text-sm font-bold w-full sm:w-auto justify-center shadow-lg shadow-green-900/30";
+      } else {
+        btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg> Ban User`;
+        btn.className = "group flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-all text-sm font-bold w-full sm:w-auto justify-center shadow-lg shadow-orange-900/30";
+      }
+    }
+
+    document.getElementById('btn-ban-user').addEventListener('click', async () => {
+      if(!currentActiveUserId) return;
+      const { isBanned } = checkBanStatus(currentActiveUserData);
+      
+      if (isBanned) {
+        if(confirm(`Are you sure you want to UNBAN ${currentActiveUserData.fullName || 'this user'}?`)) {
+          const btn = document.getElementById('btn-ban-user');
+          const originalHtml = btn.innerHTML;
+          btn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; border-top-color: currentColor;"></div>';
+          try {
+            await db.collection('users').doc(currentActiveUserId).update({
+              isBanned: false,
+              'securityStatus.isBanned': false,
+              banExpiresAt: null
+            });
+            currentActiveUserData.isBanned = false;
+            if(currentActiveUserData.securityStatus) currentActiveUserData.securityStatus.isBanned = false;
+            currentActiveUserData.banExpiresAt = null;
+            
+            updateBanButtonUI();
+            selectUser(currentActiveUserData);
+          } catch (error) {
+            alert(`Failed to UNBAN: ` + error.message);
+            btn.innerHTML = originalHtml;
+          }
+        }
+      } else {
+        openBanModal();
+      }
+    });
+
+    window.openBanModal = function() {
+      if(!currentActiveUserData) return;
+      document.getElementById('ban-modal-username').innerText = currentActiveUserData.fullName || 'this user';
+      document.getElementById('ban-modal').classList.remove('hidden');
+    }
+    
+    window.closeBanModal = function() {
+      document.getElementById('ban-modal').classList.add('hidden');
+    }
+
+    window.applyBan = async function(durationStr) {
+      closeBanModal();
+      if(!currentActiveUserId) return;
+      
+      let expiresAt = null;
+      let label = "Permanently";
+      if (durationStr !== 'permanent') {
+        const now = new Date();
+        if (durationStr === '24h') {
+          now.setHours(now.getHours() + 24);
+          label = "for 24 Hours";
+        } else if (durationStr === '3d') {
+          now.setDate(now.getDate() + 3);
+          label = "for 3 Days";
+        } else if (durationStr === '7d') {
+          now.setDate(now.getDate() + 7);
+          label = "for 7 Days";
+        }
+        expiresAt = firebase.firestore.Timestamp.fromDate(now);
+      }
+      
+      if(confirm(`Are you sure you want to ban ${currentActiveUserData.fullName || 'this user'} ${label}?`)) {
+        const btn = document.getElementById('btn-ban-user');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; border-top-color: currentColor;"></div>';
+        try {
+          const updateData = {
+            isBanned: true,
+            'securityStatus.isBanned': true,
+            banExpiresAt: expiresAt,
+            activeSessionId: ''
+          };
+          
+          await db.collection('users').doc(currentActiveUserId).update(updateData);
+          
+          currentActiveUserData.isBanned = true;
+          if(!currentActiveUserData.securityStatus) currentActiveUserData.securityStatus = {};
+          currentActiveUserData.securityStatus.isBanned = true;
+          currentActiveUserData.banExpiresAt = expiresAt;
+          currentActiveUserData.activeSessionId = '';
+          
+          updateBanButtonUI();
+          selectUser(currentActiveUserData);
+        } catch (error) {
+          alert(`Failed to apply ban: ` + error.message);
+          btn.innerHTML = originalHtml;
+        }
+      }
+    };
+
+    const iosToggle = document.getElementById('toggle-ios-features');
+    
+    db.collection('settings').doc('appConfig').onSnapshot(doc => {
+      if (doc.exists) {
+        const isEnabled = doc.data().isIOSPremiumEnabled === true;
+        iosToggle.checked = isEnabled;
+      } else {
+        iosToggle.checked = false;
+      }
+    }, err => {
+      console.error("Error listening to appConfig:", err);
+    });
+
+    iosToggle.addEventListener('change', async (e) => {
+      const isEnabled = e.target.checked;
+      
+      if (!isEnabled) {
+        const firstConfirm = confirm("⚠️ WARNING: Are you sure you want to HIDE Payment and Creator screens for ALL iOS users?\n\nThis will immediately affect all active iOS users.");
+        if (!firstConfirm) {
+          e.target.checked = true; 
+          return;
+        }
+        const secondConfirm = confirm("🔴 FINAL CONFIRMATION: This will disable premium features for iOS. Type OK to proceed.");
+        if (!secondConfirm) {
+          e.target.checked = true; 
+          return;
+        }
+      } else {
+        if (!confirm("Enable Payment and Creator screens for all iOS users?")) {
+          e.target.checked = false; 
+          return;
+        }
+      }
+
+      try {
+        await db.collection('settings').doc('appConfig').set({
+          isIOSPremiumEnabled: isEnabled,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        alert(isEnabled ? "✅ iOS Premium Features ENABLED successfully." : "iOS Premium Features have been HIDDEN.");
+      } catch (error) {
+        alert("Failed to update setting: " + error.message);
+        e.target.checked = !isEnabled; 
+      }
+    });
+
+    document.getElementById('btn-save-xp').addEventListener('click', async () => {
+      const xpInput = document.getElementById('edit-xp-input').value;
+      const xpValue = parseInt(xpInput, 10);
+      if (!currentActiveUserId) return;
+      if (isNaN(xpValue) || xpValue < 0) {
+        alert("Please enter a valid positive number for XP.");
+        return;
+      }
+      
+      const btn = document.getElementById('btn-save-xp');
+      const originalText = btn.innerText;
+      btn.innerText = "Saving...";
+      
+      try {
+        await db.collection('users').doc(currentActiveUserId).update({
+          xp: xpValue
+        });
+        
+        if (currentActiveUserData) currentActiveUserData.xp = xpValue;
+        const idx = allUsers.findIndex(u => u.id === currentActiveUserId);
+        if (idx !== -1) allUsers[idx].xp = xpValue;
+        
+        btn.innerText = "Saved!";
+        btn.classList.add('bg-green-500', 'text-white');
+        btn.classList.remove('bg-brand-gold', 'text-black');
+        
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.classList.remove('bg-green-500', 'text-white');
+          btn.classList.add('bg-brand-gold', 'text-black');
+        }, 2000);
+      } catch (error) {
+        alert("Failed to update XP: " + error.message);
+        btn.innerText = "Failed";
+        setTimeout(() => btn.innerText = originalText, 2000);
+      }
+    });
+
+  </script>
+  
+  <div id="ban-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeBanModal()"></div>
+    <div class="relative w-full max-w-md glass-panel rounded-2xl p-6 shadow-2xl border border-brand-panelBorder transform transition-all bg-[#0B0C10]">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+      
+      <div class="flex justify-between items-center mb-6 relative z-10">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          Restrict User Access
+        </h2>
+        <button onclick="closeBanModal()" class="text-gray-500 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      
+      <p class="text-sm text-gray-400 mb-6 relative z-10">Select the duration to ban <span id="ban-modal-username" class="font-bold text-white">this user</span>. They will be logged out immediately.</p>
+      
+      <div class="space-y-3 relative z-10">
+        <button onclick="applyBan('24h')" class="w-full flex items-center justify-between px-4 py-3 bg-black/40 hover:bg-white/5 border border-brand-panelBorder rounded-xl transition-all group">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+            <span class="font-medium text-white group-hover:text-brand-gold transition-colors">24 Hours</span>
+          </div>
+          <span class="text-xs text-gray-500">Temporary</span>
+        </button>
+        <button onclick="applyBan('3d')" class="w-full flex items-center justify-between px-4 py-3 bg-black/40 hover:bg-white/5 border border-brand-panelBorder rounded-xl transition-all group">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>
+            <span class="font-medium text-white group-hover:text-brand-gold transition-colors">3 Days</span>
+          </div>
+          <span class="text-xs text-gray-500">Temporary</span>
+        </button>
+        <button onclick="applyBan('7d')" class="w-full flex items-center justify-between px-4 py-3 bg-black/40 hover:bg-white/5 border border-brand-panelBorder rounded-xl transition-all group">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>
+            <span class="font-medium text-white group-hover:text-brand-gold transition-colors">7 Days</span>
+          </div>
+          <span class="text-xs text-gray-500">Temporary</span>
+        </button>
+        <button onclick="applyBan('permanent')" class="w-full flex items-center justify-between px-4 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl transition-all group mt-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div>
+            <span class="font-bold text-red-500">Permanent Ban</span>
+          </div>
+          <span class="text-xs text-red-500/70">Irreversible</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
+    const modalCreateAccount = document.getElementById('modal-create-account');
+    const btnOpenCreateAccount = document.getElementById('btn-open-create-account');
+    const btnCloseCreateAccount = document.getElementById('btn-close-create-account');
+    const formCreateAccount = document.getElementById('form-create-account');
+    const btnSubmitCreateAccount = document.getElementById('btn-submit-create-account');
+
+    btnOpenCreateAccount.addEventListener('click', () => {
+      modalCreateAccount.classList.remove('hidden');
+    });
+
+    btnCloseCreateAccount.addEventListener('click', () => {
+      modalCreateAccount.classList.add('hidden');
+      formCreateAccount.reset();
+    });
+
+    formCreateAccount.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullname = document.getElementById('create-fullname').value.trim();
+      const email = document.getElementById('create-email').value.trim();
+      const password = document.getElementById('create-password').value;
+      const role = document.getElementById('create-role').value;
+
+      btnSubmitCreateAccount.disabled = true;
+      btnSubmitCreateAccount.innerHTML = '<div class="spinner mx-auto border-black"></div>';
+
+      try {
+        const userCredential = await secondaryApp.auth().createUserWithEmailAndPassword(email, password);
+        const uid = userCredential.user.uid;
+
+        await db.collection('users').doc(uid).set({
+          uid: uid,
+          fullName: fullname,
+          email: email,
+          role: role,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          xp: 0,
+          platform: 'web_admin'
+        });
+
+        await secondaryApp.auth().signOut();
+        alert(`${role === 'contentCreator' ? 'Content Creator' : 'Student'} account created successfully!\n\nEmail: ${email}\nPassword: ${password}`);
+        
+        modalCreateAccount.classList.add('hidden');
+        formCreateAccount.reset();
+        loadAllUsers();
+        
+      } catch (error) {
+        console.error("Error creating account:", error);
+        alert(`Error creating account: ${error.message}`);
+      } finally {
+        btnSubmitCreateAccount.disabled = false;
+        btnSubmitCreateAccount.innerHTML = 'Create User';
+      }
+    });
+
+    // --- Maintenance Mode Logic ---
+    const toggleMaintenance = document.getElementById('toggle-maintenance');
+    
+    // Listen for changes from Firestore
+    db.collection('settings').doc('app_config').onSnapshot(doc => {
+      if (doc.exists) {
+        toggleMaintenance.checked = doc.data().maintenanceMode === true;
+      }
+    });
+
+    toggleMaintenance.addEventListener('change', async (e) => {
+      const isMaintenance = e.target.checked;
+      try {
+        await db.collection('settings').doc('app_config').set({
+          maintenanceMode: isMaintenance
+        }, { merge: true });
+      } catch (error) {
+        console.error("Error updating maintenance mode:", error);
+        e.target.checked = !isMaintenance; // revert on error
+        alert("Failed to update maintenance mode. Check console.");
+      }
+    });
+    // --- Global Announcement Logic ---
+    const btnSendAnnouncement = document.getElementById('btn-send-announcement');
+    btnSendAnnouncement.addEventListener('click', async () => {
+      const titleInput = document.getElementById('announcement-title');
+      const bodyInput = document.getElementById('announcement-body');
+      
+      const title = titleInput.value.trim();
+      const body = bodyInput.value.trim();
+
+      if (!title || !body) {
+        alert("Please enter both title and message for the announcement.");
+        return;
+      }
+
+      const confirmSend = confirm(`Are you sure you want to broadcast this to ALL users?\n\nTitle: ${title}\nMessage: ${body}`);
+      if (!confirmSend) return;
+
+      try {
+        const originalText = btnSendAnnouncement.innerText;
+        btnSendAnnouncement.innerText = 'Broadcasting...';
+        btnSendAnnouncement.disabled = true;
+
+        const sendGlobalAnnouncement = firebase.functions().httpsCallable('sendGlobalAnnouncement');
+        const result = await sendGlobalAnnouncement({ title, body });
+        
+        alert("Broadcast sent successfully!");
+        titleInput.value = '';
+        bodyInput.value = '';
+      } catch (error) {
+        console.error("Error sending broadcast:", error);
+        alert(`Failed to send broadcast: ${error.message}`);
+      } finally {
+        btnSendAnnouncement.innerText = 'Broadcast Message';
+        btnSendAnnouncement.disabled = false;
+      }
+    });
+
+    // --- Pre-Registrations Logic ---
+    const preregList = document.getElementById('prereg-list');
+    const badgePrereg = document.getElementById('badge-prereg');
+    const preregCount = document.getElementById('prereg-count');
+
+    db.collection('preRegistrations').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+      preregList.innerHTML = '';
+      const count = snapshot.size;
+      preregCount.innerText = count;
+      
+      if (count > 0) {
+        badgePrereg.innerText = count;
+        badgePrereg.classList.remove('hidden');
+      } else {
+        badgePrereg.classList.add('hidden');
+      }
+
+      if (snapshot.empty) {
+        preregList.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-gray-500">No pending pre-registrations found.</td></tr>';
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const dateStr = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Just now';
+        
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-brand-panelBorder/50 hover:bg-white/5 transition-colors";
+        tr.innerHTML = `
+          <td class="py-3 px-4">${dateStr}</td>
+          <td class="py-3 px-4 font-semibold text-white">${data.name || 'N/A'}</td>
+          <td class="py-3 px-4">
+            <div>${data.email || 'N/A'}</div>
+            <div class="text-xs text-brand-gold">${data.phone || 'N/A'}</div>
+          </td>
+          <td class="py-3 px-4">
+            <div class="flex flex-wrap gap-1">
+              ${(data.subjects || []).map(s => `<span class="bg-brand-gold/20 text-brand-gold px-2 py-0.5 rounded text-xs">${s}</span>`).join('')}
+            </div>
+          </td>
+          <td class="py-3 px-4 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <button onclick="approvePreReg('${doc.id}', '${data.name}', '${data.email}')" class="px-3 py-1.5 bg-green-500/20 text-green-500 hover:bg-green-500 hover:text-white rounded transition-colors text-xs font-bold">Approve</button>
+              <button onclick="deletePreReg('${doc.id}')" class="px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded transition-colors text-xs font-bold">Delete</button>
+            </div>
+          </td>
+        `;
+        preregList.appendChild(tr);
+      });
+    });
+
+    window.approvePreReg = function(id, name, email) {
+      document.getElementById('create-fullname').value = name || '';
+      document.getElementById('create-email').value = email || '';
+      modalCreateAccount.classList.remove('hidden');
+    };
+
+    window.deletePreReg = async function(id) {
+      if(confirm("Are you sure you want to delete this pre-registration?")) {
+        await db.collection('preRegistrations').doc(id).delete();
+      }
+    };
+
+    // --- Support Tickets Logic ---
+    const supportList = document.getElementById('support-list');
+    const badgeSupport = document.getElementById('badge-support');
+    const metricTotal = document.getElementById('metric-total');
+    const metricProgress = document.getElementById('metric-progress');
+    const metricResolved = document.getElementById('metric-resolved');
+
+    db.collection('supportRequests').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+      supportList.innerHTML = '';
+      const count = snapshot.size;
+      
+      let inProgressCount = 0;
+      let resolvedCount = 0;
+      let openCount = 0;
+
+      if (count > 0) {
+        badgeSupport.innerText = count;
+        badgeSupport.classList.remove('hidden');
+      } else {
+        badgeSupport.classList.add('hidden');
+      }
+
+      if (snapshot.empty) {
+        metricTotal.innerText = '0';
+        metricProgress.innerText = '0';
+        metricResolved.innerText = '0';
+        supportList.innerHTML = '<div class="col-span-full py-8 text-center text-gray-500">No support tickets at the moment.</div>';
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const dateStr = data.createdAt ? data.createdAt.toDate().toLocaleString() : 'Just now';
+        
+        const status = data.status || 'Open';
+        if(status === 'In Progress') inProgressCount++;
+        if(status === 'Resolved' || status === 'Done') resolvedCount++;
+        if(status === 'Open') openCount++;
+        
+        // Define color based on status
+        let statusColor = 'text-brand-gold';
+        if(status === 'In Progress') statusColor = 'text-blue-400';
+        if(status === 'Resolved' || status === 'Done') statusColor = 'text-green-400';
+
+        const card = document.createElement('div');
+        card.className = "bg-black/30 border border-brand-panelBorder rounded-xl p-5 hover:border-brand-gold/50 transition-colors flex flex-col shadow-lg";
+        card.innerHTML = `
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <h3 class="font-bold text-white text-lg">${data.name || 'Anonymous User'}</h3>
+              <a href="mailto:${data.email}" class="text-sm text-brand-gold hover:underline">${data.email || 'No email provided'}</a>
+            </div>
+            <span class="text-[11px] text-gray-500 font-medium">${dateStr}</span>
+          </div>
+          <div class="mb-3 flex justify-between items-center">
+            <span class="bg-white/10 text-gray-300 px-2 py-1 rounded text-xs uppercase tracking-wider font-bold">${data.category || 'General'}</span>
+            <span class="text-xs font-black uppercase tracking-wider ${statusColor}">${status}</span>
+          </div>
+          <div class="bg-black/40 rounded-lg p-3 mb-4 flex-1">
+            <p class="text-sm text-gray-300 leading-relaxed">${data.message || ''}</p>
+          </div>
+          <div class="mt-auto border-t border-white/10 pt-4">
+            <label class="text-[10px] uppercase text-gray-500 font-bold mb-1.5 block">Update Status</label>
+            <select onchange="updateSupportStatus('${doc.id}', this.value)" class="w-full bg-black/60 border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-gold outline-none cursor-pointer font-medium mb-3">
+              <option value="Open" ${status === 'Open' ? 'selected' : ''}>Open</option>
+              <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+              <option value="Resolved" ${status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+              <option value="Done" ${status === 'Done' ? 'selected' : ''}>Done</option>
+            </select>
+            <button onclick="deleteSupport('${doc.id}')" class="w-full px-3 py-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors text-xs font-bold border border-red-500/30">Delete Ticket</button>
+          </div>
+        `;
+        supportList.appendChild(card);
+      });
+      
+      metricTotal.innerText = count.toString();
+      metricProgress.innerText = inProgressCount.toString();
+      metricResolved.innerText = resolvedCount.toString();
+      badgeSupport.innerText = openCount > 0 ? openCount.toString() : count.toString();
+    });
+
+    window.updateSupportStatus = async function(id, newStatus) {
+      try {
+        await db.collection('supportRequests').doc(id).update({
+          status: newStatus
+        });
+      } catch (error) {
+        console.error("Error updating status:", error);
+        alert("Failed to update status.");
+      }
+    };
+
+    window.deleteSupport = async function(id) {
+      if(confirm("Are you sure you want to permanently delete this ticket?")) {
+        try {
+          await db.collection('supportRequests').doc(id).delete();
+        } catch (error) {
+          console.error("Error deleting ticket:", error);
+          alert("Failed to delete ticket.");
+        }
+      }
+    };
+
+  </script>
+</body>
+</html>
