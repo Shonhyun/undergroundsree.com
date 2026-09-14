@@ -14,6 +14,7 @@ const navLinks = [
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -24,6 +25,9 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
+
   return (
     <motion.nav 
       className={`navbar ${isScrolled ? 'scrolled' : ''}`}
@@ -32,7 +36,7 @@ const Navbar: React.FC = () => {
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
     >
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link to="/" className="nav-brand" style={{ textDecoration: 'none' }}>
+        <Link to="/" className="nav-brand" style={{ textDecoration: 'none' }} onClick={closeMenu}>
           <motion.div 
             className="nav-logo-placeholder"
             whileHover={{ rotate: 8, scale: 1.1 }}
@@ -40,10 +44,11 @@ const Navbar: React.FC = () => {
           >
             <img src={iconImg} alt="App Icon" />
           </motion.div>
-          Undergrounds REE
+          <span className="brand-text">Undergrounds REE</span>
         </Link>
         
-        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+        {/* Desktop Links */}
+        <div className="nav-links desktop-only">
           {navLinks.map((link) => {
             const isActive = location.pathname === link.path;
             return (
@@ -62,6 +67,32 @@ const Navbar: React.FC = () => {
               </motion.div>
             );
           })}
+        </div>
+
+        {/* Mobile Hamburger Button */}
+        <button className={`hamburger ${isMenuOpen ? 'active' : ''}`} onClick={toggleMenu} aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        {/* Mobile Menu Drawer */}
+        <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
+          <div className="mobile-menu-links">
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link 
+                  key={link.path}
+                  to={link.path} 
+                  className={isActive ? 'active' : ''}
+                  onClick={closeMenu}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
     </motion.nav>
