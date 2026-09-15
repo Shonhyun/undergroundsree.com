@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { UpdateFeature } from '../pages/Updates';
+import type { UpdateFeature } from '../pages/Updates';
 
 // Dynamic Typewriter Text Component
 export const DynamicTypewriterText: React.FC<{ text: string; start: boolean }> = ({ text, start }) => {
