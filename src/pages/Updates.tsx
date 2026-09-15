@@ -19,20 +19,20 @@ import themesImg from '../assets/version/version-2/themes.png';
 import communityFeedsImg from '../assets/version/version-2/community-feeds.png';
 import solutionsBreakdownImg from '../assets/version/version-2/solutions-breakdown.png';
 
-type UpdateFeature = {
+export type UpdateFeature = {
   title: string;
   description: string;
   imageSrc?: string | string[];
   customUI?: React.ReactNode;
 };
 
-type AppVersion = {
+export type AppVersion = {
   version: string;
   releaseDate: string;
   features: UpdateFeature[];
 };
 
-const appVersions: AppVersion[] = [
+export const appVersions: AppVersion[] = [
   {
     version: 'Version 2.0',
     releaseDate: 'Available on iOS and Android',

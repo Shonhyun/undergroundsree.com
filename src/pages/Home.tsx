@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import '../App.css';
 
 // Import local assets
@@ -8,6 +9,7 @@ import appStoreImg from '../assets/app-store.png';
 import playStoreImg from '../assets/play-store.png';
 import PageTransition from '../components/PageTransition';
 import { useAppContext } from '../context/AppContext';
+import { appVersions } from './Updates';
 
 // Segment-based Typing Animation Component
 type Segment = { text: string; highlight?: boolean; type?: 'cursor' };
@@ -221,8 +223,8 @@ function Home() {
               whileHover={{ y: -10, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              <h3>Online Review Program</h3>
-              <p>100% pure online review with live sessions, recorded replays, and digital handouts accessible anywhere.</p>
+              <h3>Online Teaching</h3>
+              <p>100% pure online review with live teaching sessions, recorded replays, and digital handouts accessible anywhere.</p>
             </motion.div>
 
             <motion.div 
@@ -232,7 +234,7 @@ function Home() {
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
               <h3>Mobile App</h3>
-              <p>Our dedicated mobile application that brings all review materials, interactive mock exams, and smart analytics directly to your pocket.</p>
+              <p>Experience an intuitive app designed for easy access for every student. It helps you learn more with smart features to supercharge your review.</p>
             </motion.div>
 
             <motion.div 
@@ -244,6 +246,43 @@ function Home() {
               <h3>Solution Manual and Objectives</h3>
               <p>Comprehensive step-by-step solutions and objective-type questions to deeply reinforce your understanding and problem-solving skills.</p>
             </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Latest Update Section */}
+      <section className="latest-update" style={{ padding: '80px 0', backgroundColor: 'var(--color-bg-primary)', borderTop: '1px solid var(--color-bg-tertiary)', borderBottom: '1px solid var(--color-bg-tertiary)' }}>
+        <div className="container">
+          <motion.div 
+            className="latest-update-banner"
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+            style={{
+              background: 'linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(139,92,246,0.08) 100%)',
+              border: '1px solid rgba(37,99,235,0.2)',
+              borderRadius: '24px',
+              padding: '60px 40px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            <div style={{ position: 'absolute', top: '-100px', left: '-100px', width: '300px', height: '300px', background: 'rgba(37,99,235,0.15)', filter: 'blur(60px)', borderRadius: '50%' }}></div>
+            <div style={{ position: 'absolute', bottom: '-100px', right: '-100px', width: '300px', height: '300px', background: 'rgba(139,92,246,0.15)', filter: 'blur(60px)', borderRadius: '50%' }}></div>
+            
+            <span className="highlight" style={{ marginBottom: '16px', display: 'inline-block', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>Latest Update</span>
+            <h2 style={{ fontSize: '42px', marginBottom: '20px', zIndex: 1, letterSpacing: '-1px' }}>{appVersions[0].version} is now available!</h2>
+            <p style={{ fontSize: '18px', color: 'var(--color-text-muted)', maxWidth: '700px', marginBottom: '32px', zIndex: 1, lineHeight: '1.6' }}>
+              We've just released a massive update to help you review better. Highlights include {appVersions[0].features.slice(0, 3).map(f => f.title).join(', ')}, and many more!
+            </p>
+            <Link to="/updates" className="btn btn-primary" style={{ zIndex: 1, padding: '16px 32px' }}>
+              See What's New
+            </Link>
           </motion.div>
         </div>
       </section>
