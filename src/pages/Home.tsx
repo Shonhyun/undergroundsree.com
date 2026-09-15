@@ -394,7 +394,7 @@ function Home() {
             </h2>
             <p>
               <TypewriterText 
-                segments={[{ text: "Engr. Clibourn is the founder of Undergrounds REE Review Center, and a practicing electrical contractor originally from Iligan City, now based in Davao City. He started the Undergrounds project in June 2025 with a dedicated mission to help students review efficiently and achieve their dreams of becoming licensed engineers." }]} 
+                segments={[{ text: "Engr. Clibourn is the founder of Undergrounds REE Review Center, and a practicing electrical contractor. He started the Undergrounds project in June 2025 with a dedicated mission to help students review efficiently and achieve their dreams of becoming licensed engineers." }]} 
                 startTyping={startAboutTyping} 
                 speed={15} 
                 delay={1500} 
