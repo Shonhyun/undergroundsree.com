@@ -8,6 +8,7 @@ const navLinks = [
   { path: '/updates', label: 'Updates' },
   { path: '/enroll', label: 'Enroll' },
   { path: '/support', label: 'Support' },
+  { path: '/inquiry', label: 'Inquiry' },
   { path: '/privacy-policy', label: 'Privacy' },
   { path: '/terms', label: 'Terms' },
 ];
