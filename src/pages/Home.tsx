@@ -10,6 +10,7 @@ import playStoreImg from '../assets/play-store.png';
 import PageTransition from '../components/PageTransition';
 import { useAppContext } from '../context/AppContext';
 import { appVersions } from './Updates';
+import { ShuffleTypewriterFeatureRow } from '../components/UpdateFeatureRow';
 
 // Segment-based Typing Animation Component
 type Segment = { text: string; highlight?: boolean; type?: 'cursor' };
@@ -243,47 +244,40 @@ function Home() {
               whileHover={{ y: -10, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              <h3>Solution Manual and Objectives</h3>
-              <p>Comprehensive step-by-step solutions and objective-type questions to deeply reinforce your understanding and problem-solving skills.</p>
+              <h3>Materials</h3>
+              <p>Solution sets and objective-type questions that strictly follow the latest trends in the board exams, ensuring your review is always up-to-date.</p>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Latest Update Section */}
-      <section className="latest-update" style={{ padding: '80px 0', backgroundColor: 'var(--color-bg-primary)', borderTop: '1px solid var(--color-bg-tertiary)', borderBottom: '1px solid var(--color-bg-tertiary)' }}>
+      <section className="latest-update updates-page" style={{ padding: '80px 0', backgroundColor: 'var(--color-bg-primary)', borderTop: '1px solid var(--color-bg-tertiary)', borderBottom: '1px solid var(--color-bg-tertiary)', minHeight: 'auto', paddingTop: '80px' }}>
         <div className="container">
           <motion.div 
-            className="latest-update-banner"
-            initial={{ opacity: 0, y: 30, scale: 0.98 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, amount: 0.3 }}
+            className="section-header"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.6 }}
-            style={{
-              background: 'linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(139,92,246,0.08) 100%)',
-              border: '1px solid rgba(37,99,235,0.2)',
-              borderRadius: '24px',
-              padding: '60px 40px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
+            style={{ marginBottom: '0' }}
           >
-            <div style={{ position: 'absolute', top: '-100px', left: '-100px', width: '300px', height: '300px', background: 'rgba(37,99,235,0.15)', filter: 'blur(60px)', borderRadius: '50%' }}></div>
-            <div style={{ position: 'absolute', bottom: '-100px', right: '-100px', width: '300px', height: '300px', background: 'rgba(139,92,246,0.15)', filter: 'blur(60px)', borderRadius: '50%' }}></div>
-            
-            <span className="highlight" style={{ marginBottom: '16px', display: 'inline-block', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>Latest Update</span>
-            <h2 style={{ fontSize: '42px', marginBottom: '20px', zIndex: 1, letterSpacing: '-1px' }}>{appVersions[0].version} is now available!</h2>
-            <p style={{ fontSize: '18px', color: 'var(--color-text-muted)', maxWidth: '700px', marginBottom: '32px', zIndex: 1, lineHeight: '1.6' }}>
-              We've just released a massive update to help you review better. Highlights include {appVersions[0].features.slice(0, 3).map(f => f.title).join(', ')}, and many more!
-            </p>
-            <Link to="/updates" className="btn btn-primary" style={{ zIndex: 1, padding: '16px 32px' }}>
-              See What's New
-            </Link>
+            <span className="highlight" style={{ marginBottom: '16px', display: 'inline-block', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>Latest Release</span>
+            <h2 style={{ fontSize: '42px', marginBottom: '20px', letterSpacing: '-1px' }}>{appVersions[0].version} Features</h2>
+            <p style={{ fontSize: '18px', color: 'var(--color-text-muted)', maxWidth: '700px', margin: '0 auto' }}>We've just released a massive update! Scroll down to see everything new you can enjoy today.</p>
           </motion.div>
+          
+          <div className="version-block" style={{ marginTop: '80px', marginBottom: '0' }}>
+            <div className="features-list">
+              {appVersions[0].features.map((feature, fIndex) => (
+                <ShuffleTypewriterFeatureRow 
+                  key={fIndex} 
+                  feature={feature} 
+                  isReverse={fIndex % 2 !== 0} 
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
