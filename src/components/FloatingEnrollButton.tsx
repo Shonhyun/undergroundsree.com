@@ -28,9 +28,14 @@ const FloatingEnrollButton: React.FC = () => {
         whileTap={{ scale: 0.94 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
-        <Link to="/enroll" className="floating-enroll-btn">
+        <a 
+          href="https://docs.google.com/forms/d/e/1FAIpQLSdUGopgYWyTpyTDef17rbCt9CaYm3Yk2kiCqveg-hZbzsgBZg/viewform?usp=send_form" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="floating-enroll-btn"
+        >
           <span className="btn-text">Enroll Now!</span>
-        </Link>
+        </a>
       </motion.div>
     </motion.div>
   );
