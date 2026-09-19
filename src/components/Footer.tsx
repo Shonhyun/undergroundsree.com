@@ -8,6 +8,7 @@ const footerLinks = [
   { path: '/updates', label: 'Updates' },
   { path: '/enroll', label: 'Enroll Now' },
   { path: '/support', label: 'Support' },
+  { path: '/join', label: 'Community' },
   { path: '/privacy-policy', label: 'Privacy Policy' },
   { path: '/terms', label: 'Terms & Conditions' },
   { path: '/account-deletion', label: 'Account Deletion' },

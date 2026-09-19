@@ -9,6 +9,7 @@ const navLinks = [
   { path: '/enroll', label: 'Enroll' },
   { path: '/support', label: 'Support' },
   { path: '/inquiry', label: 'Inquiry' },
+  { path: '/join', label: 'Community' },
   { path: '/privacy-policy', label: 'Privacy' },
   { path: '/terms', label: 'Terms' },
 ];
