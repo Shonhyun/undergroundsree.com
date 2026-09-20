@@ -7,6 +7,7 @@ import '../App.css';
 import clibournImg from '../assets/clibourn.jpg';
 import appStoreImg from '../assets/app-store.png';
 import playStoreImg from '../assets/play-store.png';
+import qrCodeImg from '../assets/qr-code-group.jpeg';
 import PageTransition from '../components/PageTransition';
 import { useAppContext } from '../context/AppContext';
 import { appVersions } from './Updates';
@@ -122,16 +123,154 @@ function Home() {
 
   const APP_STORE_LINK = "https://apps.apple.com/us/app/undergrounds-ree-review/id6745921735";
   const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.undergrounds.reviewcenterapp&pcampaignid=web_share";
+  const GROUP_CHAT_LINK = "https://m.me/ch/AbbLJzyPOXZRq0oy/?send_source=cm%3Acopy_invite_link&join_source=cm%3Axma";
 
   return (
     <PageTransition>
-      {/* Hero Section */}
-      <section id="home" className="hero">
-        <motion.div 
+      {/* Latest Update Section — first on the page, so it clears the fixed navbar */}
+      <section className="latest-update updates-page latest-update-first">
+        <div className="container">
+          <motion.div
+            className="section-header"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '0' }}
+          >
+            <span className="highlight" style={{ marginBottom: '16px', display: 'inline-block', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>Latest Release</span>
+            <h2 style={{ fontSize: '42px', marginBottom: '20px', letterSpacing: '-1px' }}>{appVersions[0].version} Features</h2>
+            <p style={{ fontSize: '18px', color: 'var(--color-text-muted)', maxWidth: '700px', margin: '0 auto' }}>We've just released a massive update! Scroll down to see everything new you can enjoy today.</p>
+          </motion.div>
+
+          <div className="version-block" style={{ marginTop: '80px', marginBottom: '0' }}>
+            <div className="features-list">
+              {appVersions[0].features.map((feature, fIndex) => (
+                <ShuffleTypewriterFeatureRow
+                  key={fIndex}
+                  feature={feature}
+                  isReverse={fIndex % 2 !== 0}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Community Section */}
+      <section id="community" className="community">
+        <div className="container" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="highlight" style={{ marginBottom: '16px', display: 'inline-block', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>Community</span>
+            <h2 style={{ fontSize: '42px', marginBottom: '20px', letterSpacing: '-1px' }}>Join the Undergrounds Group Chat</h2>
+            <p style={{ fontSize: '18px', color: 'var(--color-text-muted)', marginBottom: '40px', lineHeight: '1.6' }}>
+              Connect with fellow students, get updates, and join the discussion. Scan the QR code below or click the button to join directly.
+            </p>
+
+            <motion.div
+              style={{
+                background: 'linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(139,92,246,0.08) 100%)',
+                border: '1px solid rgba(37,99,235,0.2)',
+                borderRadius: '24px',
+                padding: '40px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                boxShadow: '0 10px 30px -10px rgba(0,0,0,0.3)'
+              }}
+              whileHover={{ y: -5 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', marginBottom: '30px' }}>
+                <img
+                  src={qrCodeImg}
+                  alt="QR Code to Join Group Chat"
+                  style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '8px' }}
+                />
+              </div>
+
+              <p style={{ color: 'var(--color-text-muted)', marginBottom: '20px' }}>Can't scan? Click below to join directly:</p>
+
+              <a
+                href={GROUP_CHAT_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '16px', fontSize: '18px', fontWeight: 'bold' }}
+              >
+                Join Group Chat
+              </a>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Offers Section */}
+      <section id="offers" className="offers">
+        <div className="container">
+          <motion.div
+            className="section-header"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2>What We Offer</h2>
+            <p>Comprehensive review programs designed to fit your unique learning style and schedule.</p>
+          </motion.div>
+
+          <motion.div
+            className="offer-grid"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <motion.div
+              className="offer-card"
+              variants={scaleUpVariant}
+              whileHover={{ y: -10, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <h3>Online Teaching</h3>
+              <p>100% pure online review with live teaching sessions, recorded replays, and digital handouts accessible anywhere.</p>
+            </motion.div>
+
+            <motion.div
+              className="offer-card"
+              variants={scaleUpVariant}
+              whileHover={{ y: -10, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <h3>Mobile App</h3>
+              <p>Experience an intuitive app designed for easy access for every student. It helps you learn more with smart features to supercharge your review.</p>
+            </motion.div>
+
+            <motion.div
+              className="offer-card"
+              variants={scaleUpVariant}
+              whileHover={{ y: -10, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <h3>Materials</h3>
+              <p>Solution sets and objective-type questions that strictly follow the latest trends in the board exams, ensuring your review is always up-to-date.</p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Hero Section — mid-page now, so the navbar clearance padding is trimmed */}
+      <section id="home" className="hero hero-mid">
+        <motion.div
           className="container"
           variants={containerVariants}
           initial="hidden"
-          animate="visible"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
         >
           <motion.h1 variants={fadeInUpVariant}>
             Pass the Board Exam, the Undergrounds Way.
@@ -188,96 +327,12 @@ function Home() {
           >
             <h2>The Ultimate Review Companion</h2>
             <p>
-              Welcome to Undergrounds REE Review, your all-in-one mobile learning platform designed specifically to help engineering students conquer their board exams. We go beyond traditional reviewers by offering a dynamic, highly interactive, and community-driven learning experience right at your fingertips.
+              Undergrounds REE Review is your all-in-one mobile learning platform, built to help engineering students conquer the board exam. Interactive, community-driven, and always in your pocket.
             </p>
             <p>
-              Why choose Undergrounds? Because reviewing for the board exam is hard enough—it doesn't have to be boring or outdated. With Undergrounds, you get a premium, interactive, and personalized review experience that adapts to your learning pace and rewards your progress.
+              Reviewing is hard enough — it shouldn't be boring or outdated. Undergrounds adapts to your learning pace and rewards your progress every step of the way.
             </p>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Offers Section */}
-      <section id="offers" className="offers">
-        <div className="container">
-          <motion.div 
-            className="section-header"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2>What We Offer</h2>
-            <p>Comprehensive review programs designed to fit your unique learning style and schedule.</p>
-          </motion.div>
-
-          <motion.div 
-            className="offer-grid"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <motion.div 
-              className="offer-card" 
-              variants={scaleUpVariant}
-              whileHover={{ y: -10, scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <h3>Online Teaching</h3>
-              <p>100% pure online review with live teaching sessions, recorded replays, and digital handouts accessible anywhere.</p>
-            </motion.div>
-
-            <motion.div 
-              className="offer-card" 
-              variants={scaleUpVariant}
-              whileHover={{ y: -10, scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <h3>Mobile App</h3>
-              <p>Experience an intuitive app designed for easy access for every student. It helps you learn more with smart features to supercharge your review.</p>
-            </motion.div>
-
-            <motion.div 
-              className="offer-card" 
-              variants={scaleUpVariant}
-              whileHover={{ y: -10, scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <h3>Materials</h3>
-              <p>Solution sets and objective-type questions that strictly follow the latest trends in the board exams, ensuring your review is always up-to-date.</p>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Latest Update Section */}
-      <section className="latest-update updates-page" style={{ padding: '80px 0', backgroundColor: 'var(--color-bg-primary)', borderTop: '1px solid var(--color-bg-tertiary)', borderBottom: '1px solid var(--color-bg-tertiary)', minHeight: 'auto', paddingTop: '80px' }}>
-        <div className="container">
-          <motion.div 
-            className="section-header"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.6 }}
-            style={{ marginBottom: '0' }}
-          >
-            <span className="highlight" style={{ marginBottom: '16px', display: 'inline-block', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>Latest Release</span>
-            <h2 style={{ fontSize: '42px', marginBottom: '20px', letterSpacing: '-1px' }}>{appVersions[0].version} Features</h2>
-            <p style={{ fontSize: '18px', color: 'var(--color-text-muted)', maxWidth: '700px', margin: '0 auto' }}>We've just released a massive update! Scroll down to see everything new you can enjoy today.</p>
-          </motion.div>
-          
-          <div className="version-block" style={{ marginTop: '80px', marginBottom: '0' }}>
-            <div className="features-list">
-              {appVersions[0].features.map((feature, fIndex) => (
-                <ShuffleTypewriterFeatureRow 
-                  key={fIndex} 
-                  feature={feature} 
-                  isReverse={fIndex % 2 !== 0} 
-                />
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
