@@ -1,4 +1,4 @@
-/* Navbar */
+﻿/* Navbar */
 .navbar {
   position: fixed;
   top: 0;
@@ -254,10 +254,57 @@
   transform: translateY(0) scale(1) translateX(0);
 }
 
+/* Latest Release as the first section on Home: clears the fixed navbar */
+.updates-page.latest-update-first {
+  padding: 160px 0 80px;
+  min-height: auto;
+  background-color: var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-bg-tertiary);
+}
+
+/* Hero placed mid-page: no navbar clearance needed */
+.hero.hero-mid {
+  padding: 120px 0 60px;
+}
+
+/* Community Section */
+.community {
+  padding: 120px 0;
+  background-color: var(--color-bg-secondary);
+}
+
 /* Offers Section */
 .offers {
   padding: 120px 0;
   background-color: var(--color-bg-primary);
+}
+
+/* Benefits Section (follows the hero) */
+.benefits {
+  padding: 0 0 120px;
+  background-color: var(--color-bg-primary);
+}
+
+.benefits-content {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.benefits-content h2 {
+  font-size: 40px;
+  letter-spacing: -1px;
+  margin-bottom: 24px;
+}
+
+.benefits-content p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+}
+
+.benefits-content p + p {
+  margin-top: 16px;
 }
 
 .offer-grid {
@@ -1356,9 +1403,13 @@ body, .navbar, .footer, .feature-card, .offer-card, .contact-card, .modal-conten
 
   /* Global Padding */
   .hero { padding: 140px 0 60px; }
-  .offers, .features, .about, .contact, .updates-page {
+  .hero.hero-mid { padding: 80px 0 40px; }
+  .offers, .features, .about, .contact, .updates-page, .community {
     padding: 60px 0;
   }
+  .updates-page.latest-update-first { padding: 120px 0 60px; }
+  .benefits { padding: 0 0 60px; }
+  .benefits-content h2 { font-size: 32px; }
 
   /* Typography */
   .hero h1 {
