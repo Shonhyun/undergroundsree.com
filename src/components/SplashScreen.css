@@ -1,10 +1,15 @@
 /* ==========================================================================
    Splash Screen — initial page load intro
-   Timeline (ms): 0 overlay | 300 icon pop-in | 1500 icon slides + word reveals
-                  | 3000 overlay exits | 3650 unmount
+   Timeline (ms): 0 overlay | 250 icon pop | 750 hold | 1050 icon slides left
+                  | 1150 wordmark reveals | 1950 lockup holds | 2350 exit
+                  | 2950 unmount
    ========================================================================== */
 
 .splash {
+  --splash-icon-size: clamp(88px, 17vw, 128px);
+  --splash-gap: clamp(14px, 2.2vw, 22px);
+  --splash-fade: 24px;
+
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -13,66 +18,85 @@
   justify-content: center;
   background-color: var(--color-bg-primary);
   overflow: hidden;
-  /* Exit: fade + gentle lift so the site underneath feels revealed */
+  /* Exit: pure fade, no vertical movement */
   transition:
-    opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.65s cubic-bezier(0.4, 0, 0.2, 1),
-    visibility 0s linear 0.65s;
+    opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0s linear 0.55s;
 }
 
 .splash.is-exiting {
   opacity: 0;
-  transform: translateY(-2%);
   visibility: hidden;
   pointer-events: none;
 }
 
-/* --- Lockup -------------------------------------------------------------- */
+/* --- Lockup -------------------------------------------------------------
+   Flex row [icon][word-track], centered as ONE group by the overlay. The
+   track grows from 0 to the word's width, so the group's width grows and
+   flex centering moves the icon left by exactly half that growth.
+   ------------------------------------------------------------------------ */
 
 .splash-lockup {
-  --splash-fade: 24px;
   display: flex;
   align-items: center;
   /* Keep the tile + word inside the viewport on narrow phones */
   max-width: calc(100vw - 32px);
   /* Offset the trailing fade padding so the visible lockup stays centered */
   margin-right: calc(var(--splash-fade) * -1);
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.splash.is-exiting .splash-lockup {
+  transform: scale(0.97);
+}
+
+/* --- App icon -------------------------------------------------------------
+   Rounded-square container with internal padding; the full artwork is
+   shown with object-fit: contain (no cropping, no stretching).
+   ------------------------------------------------------------------------ */
 
 .splash-icon {
   position: relative;
-  z-index: 2; /* sits above the word so the word emerges from behind it */
+  z-index: 2;
   flex: 0 0 auto;
-  width: clamp(72px, 15vw, 112px);
-  height: clamp(72px, 15vw, 112px);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--splash-icon-size);
+  height: var(--splash-icon-size);
+  /* Horizontal breathing room; the landscape artwork letterboxes vertically */
+  padding: calc(var(--splash-icon-size) * 0.07);
+  border-radius: calc(var(--splash-icon-size) * 0.225);
   background: #000;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18);
   opacity: 0;
-  transform: scale(0.82);
+  transform: scale(0.84);
   will-change: transform, opacity;
 }
 
 .splash-icon img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* same framing as the navbar tile, aspect ratio preserved */
-  transform: scale(1.85);
-  transform-origin: 50% 24%; /* frame on the emblem, above the in-image wordmark */
+  object-fit: contain;
+  object-position: center;
+  user-select: none;
 }
 
-/* Pop-in: slightly small + transparent -> full size. Smooth, no overshoot. */
+/* Pop: small + transparent -> slight overshoot -> settle. */
 .splash.is-icon-in .splash-icon {
-  animation: splashIconIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: splashIconPop 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-@keyframes splashIconIn {
-  from {
+@keyframes splashIconPop {
+  0% {
     opacity: 0;
-    transform: scale(0.82);
+    transform: scale(0.84);
   }
-  to {
+  55% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -80,17 +104,15 @@
 
 /* --- Word reveal ---------------------------------------------------------
    The word lives in a grid track that grows 0fr -> 1fr (no width measuring,
-   so it is safe even before the web font arrives). Because the lockup is
-   centered, growing the track pushes the icon left at the same rate the
-   word unrolls. The word's leading edge is anchored to the icon, so it
-   travels with the tile while the soft-masked reveal edge runs outward in
-   reading order: the icon pulls the word out behind it.
+   so it is safe even before the web font arrives). The track growth is
+   what moves the icon, and the letters fade/slide in one after another in
+   step with the growing edge, so the icon reads as pulling the word out.
    ------------------------------------------------------------------------ */
 
 .splash-word-track {
   display: grid;
   grid-template-columns: 0fr;
-  transition: grid-template-columns 0.75s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: grid-template-columns 0.8s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .splash-word-clip {
@@ -112,7 +134,7 @@
 .splash-word {
   display: inline-block;
   white-space: nowrap;
-  padding-left: clamp(12px, 2vw, 18px); /* visual gap to the icon */
+  padding-left: var(--splash-gap);
   padding-right: var(--splash-fade); /* keeps the last letter clear of the fade */
   font-family: var(--font-family);
   font-weight: 700;
@@ -123,8 +145,28 @@
   text-transform: uppercase;
 }
 
+.splash-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateX(-0.35em); /* pulled out from the icon's direction */
+  transition:
+    opacity 0.16s ease-out,
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  /* transition-delay is set per letter inline */
+}
+
+/* No trailing tracking after the last letter, so the group centers truly */
+.splash-letter:last-child {
+  letter-spacing: 0;
+}
+
 .splash.is-expanded .splash-word-track {
   grid-template-columns: 1fr;
+}
+
+.splash.is-expanded .splash-letter {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* --- Reduced motion --------------------------------------------------------
@@ -133,10 +175,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .splash {
-    transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
   }
 
-  .splash.is-exiting {
+  .splash-lockup,
+  .splash.is-exiting .splash-lockup {
+    transition: none;
     transform: none;
   }
 
@@ -145,11 +189,17 @@
     animation: none;
     opacity: 1;
     transform: none;
-    transition: opacity 0.35s ease;
   }
 
   .splash-word-track {
     transition: none;
     grid-template-columns: 1fr;
+  }
+
+  .splash-letter {
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+    transition-delay: 0ms !important;
   }
 }
