@@ -14,6 +14,7 @@ import JoinUs from './pages/JoinUs';
 import SupportModal from './components/SupportModal';
 import FloatingEnrollButton from './components/FloatingEnrollButton';
 import SmoothScroll from './components/SmoothScroll';
+import SplashScreen from './components/SplashScreen';
 import { AppProvider } from './context/AppContext';
 import './App.css';
 
@@ -48,6 +49,8 @@ function AppContent() {
 function App() {
   return (
     <AppProvider>
+      {/* Initial-load intro only; unmounts itself once the animation completes */}
+      <SplashScreen />
       <SmoothScroll>
         <Router>
           <AppContent />
