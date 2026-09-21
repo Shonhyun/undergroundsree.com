@@ -221,6 +221,11 @@
               <option value="online">Online (Today)</option>
               <option value="offline">Offline (Today)</option>
               <option value="banned">Banned</option>
+              <optgroup label="Enrollment">
+                <option value="enrolled-ug">Enrolled in UG</option>
+                <option value="enrolled-mock">Enrolled in Mock Board</option>
+                <option value="not-enrolled">Not Enrolled</option>
+              </optgroup>
             </select>
             <button id="export-csv-btn" class="p-2 border border-brand-gold/50 rounded-lg hover:bg-brand-gold/10 text-brand-gold transition-colors" title="Export CSV">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -1136,6 +1141,7 @@
         usersListEl.innerHTML = '<div class="flex justify-center p-8"><div class="spinner"></div></div>';
         const snapshot = await db.collection('users').get();
         allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        enrollmentCache = null; // user set changed; rebuild on next enrollment filter
         filterUsers();
       } catch (error) {
         usersListEl.innerHTML = `<div class="p-4 text-red-500 text-sm bg-red-500/10 rounded">Error: ${error.message}</div>`;
@@ -1174,10 +1180,71 @@
              date.getFullYear() === today.getFullYear();
     }
 
+    // Enrollment status per user (from users/{id}/paymentStatus/status).
+    // Loaded once, only when an enrollment filter is first used, and kept in
+    // sync by the enrollment/mock board toggles in the profile panel.
+    const UG_PAID_FIELDS = modulesList.map(m => `${m}Paid`);
+    const MOCK_PAID_FIELDS = mockBoardsList.map(m => `${m}MockBoardPaid`);
+    let enrollmentCache = null; // { [userId]: { ug: boolean, mock: boolean } }
+    let enrollmentCachePromise = null;
+
+    function isEnrollmentFilter(value) {
+      return value === 'enrolled-ug' || value === 'enrolled-mock' || value === 'not-enrolled';
+    }
+
+    function enrollmentFromPayment(data) {
+      const d = data || {};
+      return {
+        ug: UG_PAID_FIELDS.some(f => d[f] === true),
+        mock: MOCK_PAID_FIELDS.some(f => d[f] === true)
+      };
+    }
+
+    function loadEnrollmentCache() {
+      if (enrollmentCache) return Promise.resolve(enrollmentCache);
+      if (enrollmentCachePromise) return enrollmentCachePromise;
+
+      enrollmentCachePromise = Promise.all(
+        allUsers.map(u =>
+          db.collection('users').doc(u.id).collection('paymentStatus').doc('status').get()
+            .then(doc => [u.id, enrollmentFromPayment(doc.exists ? doc.data() : null)])
+            .catch(() => [u.id, { ug: false, mock: false }])
+        )
+      ).then(entries => {
+        enrollmentCache = Object.fromEntries(entries);
+        enrollmentCachePromise = null;
+        return enrollmentCache;
+      }).catch(e => {
+        enrollmentCachePromise = null;
+        throw e;
+      });
+      return enrollmentCachePromise;
+    }
+
+    // Called after the profile-panel toggles commit, so the filter reflects edits immediately
+    async function refreshEnrollmentCacheFor(userId) {
+      if (!enrollmentCache) return;
+      try {
+        const doc = await db.collection('users').doc(userId).collection('paymentStatus').doc('status').get();
+        enrollmentCache[userId] = enrollmentFromPayment(doc.exists ? doc.data() : null);
+      } catch (e) { /* keep the previous cached value */ }
+    }
+
     function filterUsers() {
       const term = searchInput.value.toLowerCase();
       const statusFilter = document.getElementById('filter-status').value;
-      
+
+      // Enrollment filters need per-user payment docs; fetch them once, then re-run.
+      if (isEnrollmentFilter(statusFilter) && !enrollmentCache) {
+        usersListEl.innerHTML = '<div class="flex flex-col items-center gap-3 p-8"><div class="spinner"></div><span class="text-xs text-gray-500">Loading enrollment data...</span></div>';
+        loadEnrollmentCache()
+          .then(() => filterUsers())
+          .catch(e => {
+            usersListEl.innerHTML = `<div class="p-4 text-red-500 text-sm bg-red-500/10 rounded">Error loading enrollment data: ${e.message}</div>`;
+          });
+        return;
+      }
+
       const filtered = allUsers.filter(u => {
         const uRole = u.role || 'student';
         if (currentViewRole === 'student' && uRole === 'contentCreator') return false;
@@ -1193,7 +1260,14 @@
         if (statusFilter === 'online') return hasSessionId && actedToday && !isBanned;
         if (statusFilter === 'offline') return (!hasSessionId || !actedToday) && !isBanned;
         if (statusFilter === 'banned') return isBanned;
-        return true; 
+
+        if (isEnrollmentFilter(statusFilter)) {
+          const enr = enrollmentCache[u.id] || { ug: false, mock: false };
+          if (statusFilter === 'enrolled-ug') return enr.ug;
+          if (statusFilter === 'enrolled-mock') return enr.mock;
+          if (statusFilter === 'not-enrolled') return !enr.ug && !enr.mock;
+        }
+        return true;
       });
       document.getElementById('user-count').innerText = filtered.length;
       currentDisplayedUsers = filtered;
@@ -1359,8 +1433,9 @@
               
               const userRef = db.collection('users').doc(userId);
               batch.update(userRef, { adminUpdatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-              
+
               await batch.commit();
+              await refreshEnrollmentCacheFor(userId);
             } catch (e) {
               alert("Error updating course: " + e.message);
             }
@@ -1399,6 +1474,7 @@
               batch.update(userRef, { adminUpdatedAt: firebase.firestore.FieldValue.serverTimestamp() });
 
               await batch.commit();
+              await refreshEnrollmentCacheFor(user.id);
             } catch(e) {
               alert("Error updating mock board: " + e.message);
             }
