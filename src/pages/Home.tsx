@@ -158,6 +158,37 @@ function Home() {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section id="pricing" className="pricing-section">
+        <div className="container pricing-container">
+          <motion.div
+            className="section-header"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2>Programs &amp; Pricing</h2>
+            <p>Choose the program that fits you. Enrollment and payment are completed inside the Undergrounds app.</p>
+          </motion.div>
+
+          <ReferralCallout />
+          <PriceLists />
+
+          <motion.div
+            className="pricing-more"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Link to="/enroll" className="btn btn-primary">
+              See enrollment details
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Community Section */}
       <section id="community" className="community">
         <div className="container" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
@@ -424,37 +455,6 @@ function Home() {
                 <p>{feat.description}</p>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="pricing-section">
-        <div className="container pricing-container">
-          <motion.div
-            className="section-header"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2>Programs &amp; Pricing</h2>
-            <p>Choose the program that fits you. Enrollment and payment are completed inside the Undergrounds app.</p>
-          </motion.div>
-
-          <ReferralCallout />
-          <PriceLists />
-
-          <motion.div
-            className="pricing-more"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Link to="/enroll" className="btn btn-primary">
-              See enrollment details
-            </Link>
           </motion.div>
         </div>
       </section>
