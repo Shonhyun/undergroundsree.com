@@ -1,8 +1,14 @@
 import React from 'react';
 
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 
 const FloatingEnrollButton: React.FC = () => {
+  const location = useLocation();
+
+  // Redundant on the enrollment page itself, where it also covers content
+  if (location.pathname === '/enroll') return null;
+
   return (
     <motion.div 
       className="floating-enroll-wrapper"
