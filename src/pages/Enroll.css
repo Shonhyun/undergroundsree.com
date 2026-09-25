@@ -1,151 +1,132 @@
 /* ==========================================================================
-   Enrollment — 5 step flow (Plan -> Terms -> Payment -> Proof -> Status)
-   Uses the site's existing theme tokens so it matches the rest of the site
-   in both light and dark mode.
+   Enrollment — pricing preview. No selection and no checkout: enrollment and
+   payment happen inside the mobile app. Uses the site's theme tokens so it
+   matches the rest of the site in light and dark mode.
    ========================================================================== */
 
 .enroll-wrap {
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
-/* --- Stepper -------------------------------------------------------------- */
-
-.enroll-stepper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  margin-bottom: 32px;
-}
-
-.enroll-step-dot {
-  flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  border: 2px solid var(--color-bg-tertiary);
-  color: var(--color-text-light);
-  background: var(--color-bg-primary);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.enroll-step-dot.is-active {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-}
-
-.enroll-step-dot.is-done {
-  background: transparent;
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-
-.enroll-step-line {
-  flex: 1 1 auto;
-  height: 2px;
-  background: var(--color-bg-tertiary);
-  transition: background 0.4s ease;
-}
-
-.enroll-step-line.is-done {
-  background: var(--color-accent);
-}
-
-/* --- Step heading --------------------------------------------------------- */
-
-.enroll-step-label {
-  display: block;
-  text-align: center;
-  color: var(--color-accent);
-  font-weight: 700;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
+/* --- Heading -------------------------------------------------------------- */
 
 .enroll-head {
   text-align: center;
   margin-bottom: 40px;
 }
 
+.enroll-eyebrow {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--color-accent);
+  background: rgba(37, 99, 235, 0.12);
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .enroll-head h1 {
-  font-size: clamp(28px, 5vw, 38px);
+  font-size: clamp(30px, 5.5vw, 42px);
   letter-spacing: -1px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .enroll-head p {
   color: var(--color-text-muted);
   font-size: 17px;
-  max-width: 460px;
+  line-height: 1.6;
+  max-width: 520px;
   margin: 0 auto;
 }
 
-/* --- Plan selection ------------------------------------------------------- */
+/* --- Referral callout ----------------------------------------------------- */
+
+.enroll-referral {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 24px 26px;
+  margin-bottom: 48px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  text-align: left;
+}
+
+.enroll-referral-icon {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.enroll-referral-body h2 {
+  font-size: 21px;
+  letter-spacing: -0.4px;
+  margin-bottom: 8px;
+}
+
+.enroll-referral-body p {
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.enroll-referral-body strong {
+  color: var(--color-text-main);
+}
+
+.enroll-strike {
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
+.enroll-referral-price {
+  color: var(--color-accent);
+  font-size: 18px;
+}
+
+/* --- Price lists ---------------------------------------------------------- */
 
 .enroll-group-title {
   color: var(--color-accent);
   font-weight: 700;
   font-size: 15px;
-  margin: 32px 0 16px;
+  letter-spacing: 0.02em;
+  margin: 40px 0 14px;
 }
 
-.enroll-group-title:first-child {
-  margin-top: 0;
-}
-
-.enroll-plan {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  text-align: left;
-  padding: 18px 20px;
-  margin-bottom: 12px;
-  background: var(--color-bg-secondary);
+.enroll-list {
   border: 1px solid var(--color-bg-tertiary);
   border-radius: var(--radius-md);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  background: var(--color-bg-secondary);
 }
 
-.enroll-plan:hover {
-  border-color: var(--color-accent);
-  transform: translateY(-2px);
-}
-
-.enroll-plan.is-selected {
-  border-color: var(--color-accent);
-  background: rgba(37, 99, 235, 0.07);
-}
-
-.enroll-box {
-  flex: 0 0 auto;
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  border: 2px solid var(--color-bg-tertiary);
+.enroll-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #fff;
-  transition: all 0.25s ease;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--color-bg-tertiary);
 }
 
-.enroll-plan.is-selected .enroll-box,
-.enroll-check.is-checked .enroll-box {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+.enroll-row:last-child {
+  border-bottom: none;
 }
 
-.enroll-plan-name {
-  flex: 1 1 auto;
+.enroll-row-name {
   font-weight: 700;
   font-size: 17px;
   color: var(--color-text-main);
@@ -166,637 +147,74 @@
   text-transform: uppercase;
 }
 
-.enroll-plan-price {
+.enroll-row-price {
   flex: 0 0 auto;
   font-weight: 700;
   font-size: 17px;
   color: var(--color-text-main);
 }
 
-/* --- Totals / panels ------------------------------------------------------ */
+/* --- App CTA -------------------------------------------------------------- */
 
-.enroll-total {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 22px 24px;
-  margin-top: 28px;
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-bg-tertiary);
-  border-radius: var(--radius-md);
-}
-
-.enroll-total-label {
-  font-weight: 700;
-  font-size: 20px;
-}
-
-.enroll-total-value {
-  font-weight: 800;
-  font-size: 24px;
-  color: var(--color-accent);
-}
-
-.enroll-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 18px 20px;
-  margin-top: 20px;
-  border-radius: var(--radius-md);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-bg-tertiary);
-  color: var(--color-text-muted);
-  font-size: 15px;
-  line-height: 1.5;
-  text-align: left;
-}
-
-.enroll-note svg {
-  flex: 0 0 auto;
-  margin-top: 2px;
-}
-
-.enroll-note strong {
-  display: block;
-  color: var(--color-text-main);
-  margin-bottom: 2px;
-}
-
-.enroll-note.is-info {
-  background: rgba(37, 99, 235, 0.08);
-  border-color: rgba(37, 99, 235, 0.25);
-}
-
-.enroll-note.is-info svg { color: var(--color-accent); }
-
-.enroll-note.is-success {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.35);
-}
-
-.enroll-note.is-success svg { color: #10b981; }
-
-/* --- Actions -------------------------------------------------------------- */
-
-.enroll-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-top: 32px;
-}
-
-.enroll-btn-main {
-  flex: 1 1 auto;
-  justify-content: center;
-  padding: 16px 28px;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.enroll-btn-main:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.enroll-btn-back {
-  flex: 0 0 auto;
-  padding: 16px 22px;
-}
-
-/* --- Terms card ----------------------------------------------------------- */
-
-.enroll-terms {
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-bg-tertiary);
+.enroll-cta {
+  margin-top: 56px;
+  padding: 40px 32px;
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-tertiary);
+  text-align: center;
 }
 
-.enroll-terms-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--color-bg-tertiary);
+.enroll-cta h2 {
+  font-size: clamp(24px, 4vw, 30px);
+  letter-spacing: -0.6px;
+  margin-bottom: 12px;
 }
 
-.enroll-terms-head h2 {
-  font-size: 22px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.enroll-terms-head svg { color: var(--color-accent); }
-
-.enroll-lang {
-  display: flex;
-  background: var(--color-bg-tertiary);
-  border-radius: var(--radius-full);
-  padding: 4px;
-  gap: 4px;
-}
-
-.enroll-lang button {
-  padding: 6px 18px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  background: transparent;
-  color: var(--color-text-muted);
-  transition: all 0.25s ease;
-}
-
-.enroll-lang button.is-active {
-  background: var(--color-accent);
-  color: #fff;
-}
-
-.enroll-rules {
-  padding: 8px 24px 24px;
-}
-
-.enroll-rule {
-  display: flex;
-  gap: 16px;
-  padding: 20px 0;
-  text-align: left;
-  border-bottom: 1px solid var(--color-bg-tertiary);
-}
-
-.enroll-rule:last-child { border-bottom: none; }
-
-.enroll-rule-icon {
-  flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--color-accent);
-}
-
-.enroll-rule-body {
-  flex: 1 1 auto;
+.enroll-cta p {
   color: var(--color-text-muted);
   font-size: 16px;
   line-height: 1.6;
+  max-width: 440px;
+  margin: 0 auto 28px;
 }
 
-.enroll-rule-num {
-  color: var(--color-accent);
-  font-weight: 800;
-  margin-right: 6px;
-}
-
-.enroll-offenses {
-  margin-top: 10px;
-  padding-left: 2px;
-}
-
-.enroll-offenses li {
-  position: relative;
-  padding-left: 18px;
-  margin-top: 6px;
-}
-
-.enroll-offenses li::before {
-  content: '•';
-  position: absolute;
-  left: 4px;
-  color: var(--color-accent);
-}
-
-/* Agree checkbox */
-.enroll-check {
+.enroll-cta-actions {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  text-align: left;
-  padding: 20px 4px;
-  background: transparent;
-  color: var(--color-text-main);
-  font-size: 17px;
-  font-weight: 500;
-}
-
-/* --- Payment -------------------------------------------------------------- */
-
-.enroll-pay-title {
-  font-size: 20px;
-  margin: 32px 0 14px;
-  text-align: left;
-}
-
-.enroll-pay-card {
-  padding: 24px;
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-bg-tertiary);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  text-align: left;
-}
-
-.enroll-pay-label {
-  color: var(--color-text-muted);
-  font-size: 14px;
-  margin-bottom: 2px;
-}
-
-.enroll-pay-number {
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  margin-bottom: 16px;
-}
-
-.enroll-pay-name {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.enroll-copy {
-  flex: 0 0 auto;
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-accent);
-  background: transparent;
-  color: var(--color-accent);
-  font-weight: 700;
-  font-size: 14px;
-  transition: all 0.25s ease;
-}
-
-.enroll-copy:hover {
-  background: rgba(37, 99, 235, 0.1);
-}
-
-.enroll-or {
-  display: flex;
-  align-items: center;
   gap: 16px;
-  margin: 28px 0;
-  color: var(--color-text-light);
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.enroll-or::before,
-.enroll-or::after {
-  content: '';
-  flex: 1 1 auto;
-  height: 1px;
-  background: var(--color-bg-tertiary);
-}
-
-.enroll-qr {
-  background: #fff;
-  border-radius: var(--radius-lg);
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid var(--color-bg-tertiary);
-}
-
-.enroll-qr img {
-  width: 100%;
-  max-width: 280px;
-  height: auto;
-  border-radius: var(--radius-sm);
-}
-
-.enroll-qr-fallback {
-  width: 100%;
-  max-width: 280px;
-  aspect-ratio: 1;
-  border: 2px dashed #cbd5e1;
-  border-radius: var(--radius-md);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  gap: 8px;
-  text-align: center;
-  padding: 20px;
-  color: #64748b;
-  font-size: 14px;
-}
-
-.enroll-qr-caption {
-  color: #64748b;
-  font-size: 13px;
-  text-align: center;
-}
-
-/* --- Upload --------------------------------------------------------------- */
-
-.enroll-howto {
-  padding: 24px;
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-bg-tertiary);
-  border-radius: var(--radius-md);
-  margin-top: 20px;
-  text-align: left;
-}
-
-.enroll-howto h3 {
-  font-size: 17px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.enroll-howto h3 svg { color: var(--color-accent); }
-
-.enroll-howto li {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  margin-bottom: 12px;
-  color: var(--color-text-muted);
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-.enroll-howto li:last-child { margin-bottom: 0; }
-
-.enroll-howto-num {
-  flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.enroll-drop {
-  width: 100%;
-  margin-top: 20px;
-  padding: 44px 24px;
-  border: 2px dashed var(--color-accent);
-  border-radius: var(--radius-md);
-  background: rgba(37, 99, 235, 0.05);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  color: var(--color-text-main);
-  transition: all 0.3s ease;
-}
-
-.enroll-drop:hover {
-  background: rgba(37, 99, 235, 0.1);
-}
-
-.enroll-drop svg { color: var(--color-accent); }
-
-.enroll-drop strong { font-size: 17px; }
-
-.enroll-drop span {
-  color: var(--color-text-light);
-  font-size: 14px;
-}
-
-.enroll-preview {
-  margin-top: 20px;
-  padding: 16px;
-  border: 1px solid var(--color-bg-tertiary);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-secondary);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  text-align: left;
-}
-
-.enroll-preview img {
-  width: 72px;
-  height: 72px;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-  flex: 0 0 auto;
-}
-
-.enroll-preview-meta {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.enroll-preview-name {
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.enroll-preview-size {
-  color: var(--color-text-light);
-  font-size: 14px;
-}
-
-.enroll-remove {
-  flex: 0 0 auto;
-  background: transparent;
-  color: #ef4444;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-}
-
-.enroll-remove:hover { background: rgba(239, 68, 68, 0.1); }
-
-.enroll-error {
-  margin-top: 12px;
-  color: #ef4444;
-  font-size: 14px;
-  text-align: left;
-}
-
-/* --- Status --------------------------------------------------------------- */
-
-.enroll-status-card {
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-bg-tertiary);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  text-align: left;
-}
-
-.enroll-status-card h2 {
-  font-size: 26px;
-  margin-bottom: 12px;
-}
-
-.enroll-status-intro {
-  color: var(--color-text-muted);
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--color-bg-tertiary);
-  line-height: 1.6;
-}
-
-.enroll-summary {
-  margin: 24px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.enroll-summary-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.enroll-summary-key {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--color-text-muted);
-  font-size: 15px;
-}
-
-.enroll-summary-key svg {
-  flex: 0 0 auto;
-  color: var(--color-text-light);
-}
-
-.enroll-summary-val {
-  font-weight: 700;
-  text-align: right;
-  word-break: break-word;
-}
-
-.enroll-summary-val.is-amount { color: #10b981; }
-
-.enroll-pending {
-  display: block;
-  width: 100%;
-  text-align: center;
-  padding: 16px;
-  border-radius: var(--radius-full);
-  border: 1px solid #f59e0b;
-  background: rgba(245, 158, 11, 0.12);
-  color: #b45309;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  font-size: 15px;
-  margin-bottom: 24px;
-}
-
-[data-theme='dark'] .enroll-pending { color: #fbbf24; }
-
-.enroll-next {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  padding: 18px 20px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-bg-tertiary);
-  background: var(--color-bg-primary);
-  margin-bottom: 14px;
-  text-align: left;
-}
-
-.enroll-next svg {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  color: var(--color-accent);
-}
-
-.enroll-next > div > strong {
-  display: block;
-  margin-bottom: 4px;
-}
-
-/* Inline emphasis inside the paragraph must not break the line */
-.enroll-next p strong {
-  display: inline;
-  margin: 0;
-}
-
-.enroll-next p {
-  color: var(--color-text-muted);
-  font-size: 15px;
-  line-height: 1.5;
-  margin: 0;
+  flex-wrap: wrap;
 }
 
 /* --- Responsive ----------------------------------------------------------- */
 
 @media (max-width: 600px) {
-  .enroll-step-dot {
-    width: 36px;
-    height: 36px;
-    font-size: 14px;
+  .enroll-referral {
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px;
   }
 
-  .enroll-plan {
+  .enroll-referral-body h2 { font-size: 19px; }
+
+  .enroll-row {
     padding: 16px;
     gap: 12px;
   }
 
-  .enroll-plan-name,
-  .enroll-plan-price { font-size: 15px; }
+  .enroll-row-name,
+  .enroll-row-price { font-size: 15px; }
 
-  .enroll-pay-card {
+  .enroll-cta {
+    padding: 32px 20px;
+  }
+
+  .enroll-cta-actions {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
-  .enroll-pay-number { font-size: 24px; }
-
-  .enroll-terms-head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+  .enroll-cta-actions .store-btn {
+    justify-content: center;
   }
-
-  .enroll-rules { padding: 8px 16px 16px; }
-
-  .enroll-status-card { padding: 22px; }
-
-  .enroll-summary-row {
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .enroll-summary-val { text-align: left; }
-
-  .enroll-actions { flex-direction: column-reverse; }
-
-  .enroll-btn-back,
-  .enroll-btn-main { width: 100%; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .enroll-plan,
-  .enroll-step-dot,
-  .enroll-step-line,
-  .enroll-drop {
-    transition: none;
-  }
-
-  .enroll-plan:hover { transform: none; }
 }
