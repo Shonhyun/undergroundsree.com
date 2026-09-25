@@ -1,0 +1,138 @@
+/* ==========================================================================
+   Shared pricing blocks — used by the Enroll page and the Home page pricing
+   section. Read-only: no selection and no checkout, since enrollment and
+   payment happen inside the mobile app.
+   ========================================================================== */
+
+/* --- Referral callout ----------------------------------------------------- */
+
+.pricing-referral {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 24px 26px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  text-align: left;
+}
+
+.pricing-referral-icon {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.pricing-referral-body h3 {
+  font-size: 21px;
+  letter-spacing: -0.4px;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.pricing-referral-body p {
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pricing-referral-body strong {
+  color: var(--color-text-main);
+}
+
+.pricing-strike {
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
+.pricing-referral-price {
+  color: var(--color-accent);
+  font-size: 18px;
+}
+
+/* --- Price lists ---------------------------------------------------------- */
+
+.pricing-group-title {
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  margin: 40px 0 14px;
+  text-align: left;
+}
+
+.pricing-list {
+  border: 1px solid var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+}
+
+.pricing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--color-bg-tertiary);
+  text-align: left;
+}
+
+.pricing-row:last-child {
+  border-bottom: none;
+}
+
+.pricing-row-name {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pricing-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+
+.pricing-row-price {
+  flex: 0 0 auto;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--color-text-main);
+}
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .pricing-referral {
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px;
+  }
+
+  .pricing-referral-body h3 { font-size: 19px; }
+
+  .pricing-row {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .pricing-row-name,
+  .pricing-row-price { font-size: 15px; }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 import '../App.css';
 
@@ -9,6 +10,7 @@ import appStoreImg from '../assets/app-store.png';
 import playStoreImg from '../assets/play-store.png';
 import qrCodeImg from '../assets/qr-code-group.jpeg';
 import PageTransition from '../components/PageTransition';
+import { ReferralCallout, PriceLists } from '../components/PricingTables';
 import { useAppContext } from '../context/AppContext';
 import { appVersions } from './Updates';
 import { ShuffleTypewriterFeatureRow } from '../components/UpdateFeatureRow';
@@ -422,6 +424,37 @@ function Home() {
                 <p>{feat.description}</p>
               </motion.div>
             ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="pricing-section">
+        <div className="container pricing-container">
+          <motion.div
+            className="section-header"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2>Programs &amp; Pricing</h2>
+            <p>Choose the program that fits you. Enrollment and payment are completed inside the Undergrounds app.</p>
+          </motion.div>
+
+          <ReferralCallout />
+          <PriceLists />
+
+          <motion.div
+            className="pricing-more"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Link to="/enroll" className="btn btn-primary">
+              See enrollment details
+            </Link>
           </motion.div>
         </div>
       </section>

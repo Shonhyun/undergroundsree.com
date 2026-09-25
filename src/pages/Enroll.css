@@ -1,7 +1,6 @@
 /* ==========================================================================
-   Enrollment — pricing preview. No selection and no checkout: enrollment and
-   payment happen inside the mobile app. Uses the site's theme tokens so it
-   matches the rest of the site in light and dark mode.
+   Enrollment page shell. The referral callout and price lists live in
+   components/PricingTables.css, shared with the Home page pricing section.
    ========================================================================== */
 
 .enroll-wrap {
@@ -43,117 +42,6 @@
   margin: 0 auto;
 }
 
-/* --- Referral callout ----------------------------------------------------- */
-
-.enroll-referral {
-  display: flex;
-  gap: 18px;
-  align-items: flex-start;
-  padding: 24px 26px;
-  margin-bottom: 48px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-  border: 1px solid rgba(37, 99, 235, 0.28);
-  text-align: left;
-}
-
-.enroll-referral-icon {
-  flex: 0 0 auto;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-accent);
-  color: #fff;
-}
-
-.enroll-referral-body h2 {
-  font-size: 21px;
-  letter-spacing: -0.4px;
-  margin-bottom: 8px;
-}
-
-.enroll-referral-body p {
-  color: var(--color-text-muted);
-  font-size: 16px;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.enroll-referral-body strong {
-  color: var(--color-text-main);
-}
-
-.enroll-strike {
-  text-decoration: line-through;
-  opacity: 0.65;
-}
-
-.enroll-referral-price {
-  color: var(--color-accent);
-  font-size: 18px;
-}
-
-/* --- Price lists ---------------------------------------------------------- */
-
-.enroll-group-title {
-  color: var(--color-accent);
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.02em;
-  margin: 40px 0 14px;
-}
-
-.enroll-list {
-  border: 1px solid var(--color-bg-tertiary);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--color-bg-secondary);
-}
-
-.enroll-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 22px;
-  border-bottom: 1px solid var(--color-bg-tertiary);
-}
-
-.enroll-row:last-child {
-  border-bottom: none;
-}
-
-.enroll-row-name {
-  font-weight: 700;
-  font-size: 17px;
-  color: var(--color-text-main);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.enroll-badge {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  background: rgba(37, 99, 235, 0.15);
-  color: var(--color-accent);
-  text-transform: uppercase;
-}
-
-.enroll-row-price {
-  flex: 0 0 auto;
-  font-weight: 700;
-  font-size: 17px;
-  color: var(--color-text-main);
-}
-
 /* --- App CTA -------------------------------------------------------------- */
 
 .enroll-cta {
@@ -189,22 +77,6 @@
 /* --- Responsive ----------------------------------------------------------- */
 
 @media (max-width: 600px) {
-  .enroll-referral {
-    flex-direction: column;
-    gap: 14px;
-    padding: 22px;
-  }
-
-  .enroll-referral-body h2 { font-size: 19px; }
-
-  .enroll-row {
-    padding: 16px;
-    gap: 12px;
-  }
-
-  .enroll-row-name,
-  .enroll-row-price { font-size: 15px; }
-
   .enroll-cta {
     padding: 32px 20px;
   }

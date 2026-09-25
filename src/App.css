@@ -273,6 +273,21 @@
   background-color: var(--color-bg-secondary);
 }
 
+/* Pricing Section (Home) */
+.pricing-section {
+  padding: 120px 0;
+  background-color: var(--color-bg-primary);
+}
+
+.pricing-container {
+  max-width: 760px;
+}
+
+.pricing-more {
+  margin-top: 40px;
+  text-align: center;
+}
+
 /* Offers Section */
 .offers {
   padding: 120px 0;
@@ -1404,7 +1419,7 @@ body, .navbar, .footer, .feature-card, .offer-card, .contact-card, .modal-conten
   /* Global Padding */
   .hero { padding: 140px 0 60px; }
   .hero.hero-mid { padding: 80px 0 40px; }
-  .offers, .features, .about, .contact, .updates-page, .community {
+  .offers, .features, .about, .contact, .updates-page, .community, .pricing-section {
     padding: 60px 0;
   }
   .updates-page.latest-update-first { padding: 120px 0 60px; }
