@@ -171,7 +171,7 @@ function Home() {
             style={{ marginBottom: '0' }}
           >
             <span className="highlight" style={{ marginBottom: '16px', display: 'inline-block', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>Latest Release</span>
-            <h2 style={{ fontSize: '42px', marginBottom: '20px', letterSpacing: '-1px' }}>{appVersions[0].version} Features</h2>
+            <h2 style={{ fontSize: '42px', marginBottom: '20px', letterSpacing: '-1px' }}>Powerful Features, Easier Review</h2>
             <p style={{ fontSize: '18px', color: 'var(--color-text-muted)', maxWidth: '700px', margin: '0 auto' }}>We've just released a massive update! Scroll down to see everything new you can enjoy today.</p>
           </motion.div>
 
