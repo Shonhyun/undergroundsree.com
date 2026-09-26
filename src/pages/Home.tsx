@@ -129,43 +129,13 @@ function Home() {
 
   return (
     <PageTransition>
-      {/* Latest Update Section — first on the page, so it clears the fixed navbar */}
-      <section className="latest-update updates-page latest-update-first">
-        <div className="container">
-          <motion.div
-            className="section-header"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            style={{ marginBottom: '0' }}
-          >
-            <span className="highlight" style={{ marginBottom: '16px', display: 'inline-block', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>Latest Release</span>
-            <h2 style={{ fontSize: '42px', marginBottom: '20px', letterSpacing: '-1px' }}>{appVersions[0].version} Features</h2>
-            <p style={{ fontSize: '18px', color: 'var(--color-text-muted)', maxWidth: '700px', margin: '0 auto' }}>We've just released a massive update! Scroll down to see everything new you can enjoy today.</p>
-          </motion.div>
-
-          <div className="version-block" style={{ marginTop: '80px', marginBottom: '0' }}>
-            <div className="features-list">
-              {appVersions[0].features.map((feature, fIndex) => (
-                <ShuffleTypewriterFeatureRow
-                  key={fIndex}
-                  feature={feature}
-                  isReverse={fIndex % 2 !== 0}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="pricing-section">
+      {/* Pricing Section — first on the page, so it clears the fixed navbar */}
+      <section id="pricing" className="pricing-section home-first-section">
         <div className="container pricing-container">
           <motion.div
             className="section-header"
             initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
             <h2>Programs &amp; Pricing</h2>
@@ -186,6 +156,36 @@ function Home() {
               See enrollment details
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Latest Update Section */}
+      <section className="latest-update updates-page">
+        <div className="container">
+          <motion.div
+            className="section-header"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.6 }}
+            style={{ marginBottom: '0' }}
+          >
+            <span className="highlight" style={{ marginBottom: '16px', display: 'inline-block', fontSize: '14px', letterSpacing: '1px', textTransform: 'uppercase' }}>Latest Release</span>
+            <h2 style={{ fontSize: '42px', marginBottom: '20px', letterSpacing: '-1px' }}>{appVersions[0].version} Features</h2>
+            <p style={{ fontSize: '18px', color: 'var(--color-text-muted)', maxWidth: '700px', margin: '0 auto' }}>We've just released a massive update! Scroll down to see everything new you can enjoy today.</p>
+          </motion.div>
+
+          <div className="version-block" style={{ marginTop: '80px', marginBottom: '0' }}>
+            <div className="features-list">
+              {appVersions[0].features.map((feature, fIndex) => (
+                <ShuffleTypewriterFeatureRow
+                  key={fIndex}
+                  feature={feature}
+                  isReverse={fIndex % 2 !== 0}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

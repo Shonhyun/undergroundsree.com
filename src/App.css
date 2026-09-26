@@ -254,9 +254,8 @@
   transform: translateY(0) scale(1) translateX(0);
 }
 
-/* Latest Release as the first section on Home: clears the fixed navbar */
-.updates-page.latest-update-first {
-  padding: 160px 0 80px;
+/* Latest Release block on Home (second section) */
+.updates-page.latest-update {
   min-height: auto;
   background-color: var(--color-bg-primary);
   border-bottom: 1px solid var(--color-bg-tertiary);
@@ -277,6 +276,13 @@
 .pricing-section {
   padding: 120px 0;
   background-color: var(--color-bg-primary);
+  /* Separates it from the Latest Release block, which shares this background */
+  border-bottom: 1px solid var(--color-bg-tertiary);
+}
+
+/* Whichever section leads the Home page must clear the fixed navbar */
+.pricing-section.home-first-section {
+  padding-top: 160px;
 }
 
 .pricing-container {
@@ -1422,7 +1428,7 @@ body, .navbar, .footer, .feature-card, .offer-card, .contact-card, .modal-conten
   .offers, .features, .about, .contact, .updates-page, .community, .pricing-section {
     padding: 60px 0;
   }
-  .updates-page.latest-update-first { padding: 120px 0 60px; }
+  .pricing-section.home-first-section { padding-top: 120px; }
   .benefits { padding: 0 0 60px; }
   .benefits-content h2 { font-size: 32px; }
 
