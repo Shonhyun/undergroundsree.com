@@ -1,16 +1,29 @@
 /* ==========================================================================
-   App preview video — leads the Home page. The source clip is vertical, so
-   it is presented inside a phone mockup. Autoplays muted once, stops on the
-   last frame, then offers a replay.
+   App preview video — leads the Home page. Description on the left, the
+   vertical clip inside an iPhone mockup on the right. Autoplays once, with
+   sound where the browser allows it, then stops and offers a replay.
    ========================================================================== */
 
 .promo-container {
-  max-width: 900px;
+  max-width: 1040px;
+}
+
+.promo-layout {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: clamp(32px, 6vw, 80px);
+  align-items: center;
+}
+
+/* --- Left column ---------------------------------------------------------- */
+
+.promo-copy {
+  text-align: left;
 }
 
 .promo-eyebrow {
   display: inline-block;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   color: var(--color-accent);
   background: rgba(37, 99, 235, 0.12);
   padding: 4px 14px;
@@ -21,34 +34,84 @@
   text-transform: uppercase;
 }
 
-/* --- Phone mockup ---------------------------------------------------------
-   Sizes are derived from --promo-phone-w so the whole handset — bezel,
-   corner radius and notch — scales as one piece.
+.promo-copy h2 {
+  font-size: clamp(30px, 4.4vw, 44px);
+  letter-spacing: -1.2px;
+  line-height: 1.12;
+  margin-bottom: 18px;
+}
+
+.promo-copy p {
+  color: var(--color-text-muted);
+  font-size: 18px;
+  line-height: 1.65;
+  max-width: 460px;
+}
+
+/* --- iPhone 13 mockup -----------------------------------------------------
+   Every dimension derives from --promo-phone-w so the handset scales as one
+   piece: bezel, corner radius, notch and side buttons.
    ------------------------------------------------------------------------ */
 
 .promo-phone {
-  --promo-phone-w: clamp(240px, 72vw, 300px);
-  --promo-bezel: calc(var(--promo-phone-w) * 0.038);
+  --promo-phone-w: clamp(230px, 30vw, 290px);
+  --promo-bezel: calc(var(--promo-phone-w) * 0.035);
 
+  position: relative;
   width: var(--promo-phone-w);
-  margin: 0 auto;
+  flex: 0 0 auto;
   padding: var(--promo-bezel);
-  border-radius: calc(var(--promo-phone-w) * 0.155);
-  background: linear-gradient(160deg, #3a3a3e 0%, #131316 45%, #2b2b2f 100%);
+  border-radius: calc(var(--promo-phone-w) * 0.165);
+  background: linear-gradient(150deg, #4a4a50 0%, #17171a 40%, #35353b 75%, #101013 100%);
   box-shadow:
-    0 30px 60px -20px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+    0 34px 70px -24px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.07) inset;
 }
 
 [data-theme='dark'] .promo-phone {
   box-shadow:
-    0 30px 60px -20px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    0 34px 70px -24px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(255, 255, 255, 0.09) inset;
+}
+
+/* Side buttons */
+.promo-btn-silent,
+.promo-btn-volup,
+.promo-btn-voldown,
+.promo-btn-power {
+  position: absolute;
+  width: calc(var(--promo-phone-w) * 0.011);
+  background: linear-gradient(180deg, #45454b, #232327);
+  border-radius: 2px;
+}
+
+.promo-btn-silent {
+  left: calc(var(--promo-phone-w) * -0.009);
+  top: calc(var(--promo-phone-w) * 0.22);
+  height: calc(var(--promo-phone-w) * 0.075);
+}
+
+.promo-btn-volup {
+  left: calc(var(--promo-phone-w) * -0.009);
+  top: calc(var(--promo-phone-w) * 0.33);
+  height: calc(var(--promo-phone-w) * 0.125);
+}
+
+.promo-btn-voldown {
+  left: calc(var(--promo-phone-w) * -0.009);
+  top: calc(var(--promo-phone-w) * 0.48);
+  height: calc(var(--promo-phone-w) * 0.125);
+}
+
+.promo-btn-power {
+  right: calc(var(--promo-phone-w) * -0.009);
+  top: calc(var(--promo-phone-w) * 0.38);
+  height: calc(var(--promo-phone-w) * 0.175);
 }
 
 .promo-phone-screen {
   position: relative;
-  border-radius: calc(var(--promo-phone-w) * 0.125);
+  border-radius: calc(var(--promo-phone-w) * 0.135);
   overflow: hidden;
   background: #000;
   /* Matches the source clip (478x850), so nothing is cropped */
@@ -62,15 +125,60 @@
   object-fit: cover;
 }
 
-/* No notch or island overlay: the clip is a designed promo rather than a
-   screen recording, so a black pill on top would sit over its artwork. */
+/* iPhone 13 notch */
+.promo-notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(var(--promo-phone-w) * 0.44);
+  height: calc(var(--promo-phone-w) * 0.085);
+  background: #000;
+  border-bottom-left-radius: calc(var(--promo-phone-w) * 0.055);
+  border-bottom-right-radius: calc(var(--promo-phone-w) * 0.055);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* --- Sound toggle --------------------------------------------------------- */
+
+.promo-sound {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.promo-sound:hover {
+  background: rgba(0, 0, 0, 0.78);
+  transform: scale(1.04);
+}
+
+.promo-sound-hint {
+  white-space: nowrap;
+}
 
 /* --- Replay / play overlay ------------------------------------------------ */
 
 .promo-replay {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,14 +219,36 @@
   transform: scale(0.97);
 }
 
-/* --- Reduced motion ------------------------------------------------------- */
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .promo-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    justify-items: center;
+  }
+
+  .promo-copy {
+    text-align: center;
+  }
+
+  .promo-copy p {
+    margin: 0 auto;
+  }
+
+  .promo-phone {
+    --promo-phone-w: clamp(230px, 62vw, 280px);
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
+  .promo-sound,
   .promo-replay,
   .promo-replay-btn {
     transition: none;
   }
 
+  .promo-sound:hover,
   .promo-replay:hover .promo-replay-btn {
     transform: none;
   }
