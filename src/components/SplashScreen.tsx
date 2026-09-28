@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import iconImg from '../assets/icon.png';
+import { markSplashDone } from '../lib/splashSignal';
 import './SplashScreen.css';
 
 type Phase = 'initial' | 'icon-in' | 'expanded' | 'exiting' | 'done';
@@ -52,7 +53,12 @@ const SplashScreen: React.FC = () => {
       timers = [
         window.setTimeout(() => setPhase('icon-in'), t.iconIn),
         window.setTimeout(() => setPhase('expanded'), t.expand),
-        window.setTimeout(() => setPhase('exiting'), t.exit),
+        window.setTimeout(() => {
+          setPhase('exiting');
+          // Release the page as the overlay starts fading, so whatever the
+          // Home page begins on cue is already running once it is uncovered.
+          markSplashDone();
+        }, t.exit),
         window.setTimeout(() => setPhase('done'), t.remove),
       ];
     };
