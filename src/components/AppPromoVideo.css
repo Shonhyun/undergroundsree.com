@@ -54,8 +54,8 @@
    ------------------------------------------------------------------------ */
 
 .promo-phone {
-  --promo-phone-w: clamp(230px, 30vw, 290px);
-  --promo-bezel: calc(var(--promo-phone-w) * 0.035);
+  --promo-phone-w: clamp(280px, 36vw, 360px);
+  --promo-bezel: calc(var(--promo-phone-w) * 0.028);
 
   position: relative;
   width: var(--promo-phone-w);
@@ -125,28 +125,33 @@
   object-fit: cover;
 }
 
-/* iPhone 13 notch */
-.promo-notch {
+/* Dynamic Island */
+.promo-island {
   position: absolute;
-  top: 0;
+  top: calc(var(--promo-phone-w) * 0.028);
   left: 50%;
   transform: translateX(-50%);
-  width: calc(var(--promo-phone-w) * 0.44);
-  height: calc(var(--promo-phone-w) * 0.085);
+  width: calc(var(--promo-phone-w) * 0.245);
+  height: calc(var(--promo-phone-w) * 0.072);
   background: #000;
-  border-bottom-left-radius: calc(var(--promo-phone-w) * 0.055);
-  border-bottom-right-radius: calc(var(--promo-phone-w) * 0.055);
+  border-radius: var(--radius-full);
   pointer-events: none;
   z-index: 2;
 }
 
-/* --- Sound toggle --------------------------------------------------------- */
+/* --- On-screen controls --------------------------------------------------- */
 
-.promo-sound {
+.promo-controls {
   position: absolute;
   right: 10px;
   bottom: 10px;
   z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.promo-ctrl {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -164,12 +169,12 @@
   transition: background 0.25s ease, transform 0.25s ease;
 }
 
-.promo-sound:hover {
+.promo-ctrl:hover {
   background: rgba(0, 0, 0, 0.78);
   transform: scale(1.04);
 }
 
-.promo-sound-hint {
+.promo-ctrl-hint {
   white-space: nowrap;
 }
 
@@ -237,18 +242,18 @@
   }
 
   .promo-phone {
-    --promo-phone-w: clamp(230px, 62vw, 280px);
+    --promo-phone-w: clamp(260px, 72vw, 320px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .promo-sound,
+  .promo-ctrl,
   .promo-replay,
   .promo-replay-btn {
     transition: none;
   }
 
-  .promo-sound:hover,
+  .promo-ctrl:hover,
   .promo-replay:hover .promo-replay-btn {
     transform: none;
   }

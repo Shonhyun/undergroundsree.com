@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import promoVideo from '../assets/app-promotion.mp4';
+import { isSplashDone, onSplashDone } from '../lib/splashSignal';
 import './AppPromoVideo.css';
+
+/** If the splash never signals, start anyway rather than never playing. */
+const SPLASH_FALLBACK_MS = 6000;
 
 const IconReplay = (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
@@ -19,19 +23,50 @@ const IconSoundOff = (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" /></svg>
 );
 
+const IconFullscreen = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3" /><path d="M16 3h3a2 2 0 0 1 2 2v3" /><path d="M8 21H5a2 2 0 0 1-2-2v-3" /><path d="M16 21h3a2 2 0 0 0 2-2v-3" /></svg>
+);
+
+type FullscreenVideo = HTMLVideoElement & {
+  webkitEnterFullscreen?: () => void;
+  webkitRequestFullscreen?: () => void;
+};
+
 const AppPromoVideo: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [waiting, setWaiting] = useState(!isSplashDone());
   const [muted, setMuted] = useState(true);
   const [ended, setEnded] = useState(false);
   const [blocked, setBlocked] = useState(false); // autoplay refused, or reduced motion
   const [failed, setFailed] = useState(false);
 
+  // Hold until the splash intro has played out, then start.
   useEffect(() => {
+    if (!waiting) return;
+
+    let released = false;
+    const release = () => {
+      if (released) return;
+      released = true;
+      setWaiting(false);
+    };
+
+    const unsubscribe = onSplashDone(release);
+    const fallback = window.setTimeout(release, SPLASH_FALLBACK_MS);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(fallback);
+    };
+  }, [waiting]);
+
+  useEffect(() => {
+    if (waiting) return;
     const video = videoRef.current;
     if (!video) return;
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      // Don't start motion on load; let the viewer choose.
+      // Don't start motion on cue; let the viewer choose.
       video.muted = false;
       setMuted(false);
       setBlocked(true);
@@ -48,7 +83,7 @@ const AppPromoVideo: React.FC = () => {
       setMuted(true);
       video.play().catch(() => setBlocked(true));
     });
-  }, []);
+  }, [waiting]);
 
   const play = () => {
     const video = videoRef.current;
@@ -69,9 +104,18 @@ const AppPromoVideo: React.FC = () => {
     setMuted(video.muted);
   };
 
+  const goFullscreen = () => {
+    const video = videoRef.current as FullscreenVideo | null;
+    if (!video) return;
+    if (video.requestFullscreen) video.requestFullscreen().catch(() => {});
+    else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen(); // iOS Safari
+    else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+  };
+
   if (failed) return null;
 
-  const showOverlay = ended || blocked;
+  const showOverlay = !waiting && (ended || blocked);
+  const showControls = !waiting && !showOverlay;
 
   return (
     <section id="app-preview" className="promo-section home-first-section">
@@ -116,18 +160,28 @@ const AppPromoVideo: React.FC = () => {
                 onError={() => setFailed(true)}
               />
 
-              <span className="promo-notch" aria-hidden="true" />
+              <span className="promo-island" aria-hidden="true" />
 
-              {!showOverlay && (
-                <button
-                  type="button"
-                  className="promo-sound"
-                  onClick={toggleSound}
-                  aria-label={muted ? 'Turn sound on' : 'Turn sound off'}
-                >
-                  {muted ? IconSoundOff : IconSoundOn}
-                  {muted && <span className="promo-sound-hint">Tap for sound</span>}
-                </button>
+              {showControls && (
+                <div className="promo-controls">
+                  <button
+                    type="button"
+                    className="promo-ctrl"
+                    onClick={toggleSound}
+                    aria-label={muted ? 'Turn sound on' : 'Turn sound off'}
+                  >
+                    {muted ? IconSoundOff : IconSoundOn}
+                    {muted && <span className="promo-ctrl-hint">Tap for sound</span>}
+                  </button>
+                  <button
+                    type="button"
+                    className="promo-ctrl"
+                    onClick={goFullscreen}
+                    aria-label="Play fullscreen"
+                  >
+                    {IconFullscreen}
+                  </button>
+                </div>
               )}
 
               {showOverlay && (
