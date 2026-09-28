@@ -280,9 +280,22 @@
   border-bottom: 1px solid var(--color-bg-tertiary);
 }
 
+/* App preview video section (Home) */
+.promo-section {
+  padding: 120px 0;
+  background-color: var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-bg-tertiary);
+}
+
 /* Whichever section leads the Home page must clear the fixed navbar */
+.promo-section.home-first-section,
 .pricing-section.home-first-section {
   padding-top: 160px;
+}
+
+/* ...but once the promo video leads, Pricing is mid-page and drops it again */
+.promo-section ~ .pricing-section.home-first-section {
+  padding-top: 120px;
 }
 
 .pricing-container {
@@ -1425,10 +1438,12 @@ body, .navbar, .footer, .feature-card, .offer-card, .contact-card, .modal-conten
   /* Global Padding */
   .hero { padding: 140px 0 60px; }
   .hero.hero-mid { padding: 80px 0 40px; }
-  .offers, .features, .about, .contact, .updates-page, .community, .pricing-section {
+  .offers, .features, .about, .contact, .updates-page, .community, .pricing-section, .promo-section {
     padding: 60px 0;
   }
+  .promo-section.home-first-section,
   .pricing-section.home-first-section { padding-top: 120px; }
+  .promo-section ~ .pricing-section.home-first-section { padding-top: 60px; }
   .benefits { padding: 0 0 60px; }
   .benefits-content h2 { font-size: 32px; }
 

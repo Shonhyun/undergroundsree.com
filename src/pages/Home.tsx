@@ -10,6 +10,7 @@ import appStoreImg from '../assets/app-store.png';
 import playStoreImg from '../assets/play-store.png';
 import qrCodeImg from '../assets/qr-code-group.jpeg';
 import PageTransition from '../components/PageTransition';
+import AppPromoVideo from '../components/AppPromoVideo';
 import { ReferralCallout, PriceLists } from '../components/PricingTables';
 import { useAppContext } from '../context/AppContext';
 import { appVersions } from './Updates';
@@ -129,7 +130,12 @@ function Home() {
 
   return (
     <PageTransition>
-      {/* Pricing Section — first on the page, so it clears the fixed navbar */}
+      {/* App preview video — leads the page, so it clears the fixed navbar.
+          Hides itself until public/app-promo.mp4 exists. */}
+      <AppPromoVideo />
+
+      {/* Pricing Section. Keeps the first-section clearance as a fallback for
+          when the promo video is absent and this leads the page instead. */}
       <section id="pricing" className="pricing-section home-first-section">
         <div className="container pricing-container">
           <motion.div
