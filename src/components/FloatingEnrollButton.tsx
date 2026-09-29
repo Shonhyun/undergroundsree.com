@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { motion } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const FloatingEnrollButton: React.FC = () => {
   const location = useLocation();
@@ -34,14 +34,9 @@ const FloatingEnrollButton: React.FC = () => {
         whileTap={{ scale: 0.94 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
-        <a 
-          href="https://docs.google.com/forms/d/e/1FAIpQLSdUGopgYWyTpyTDef17rbCt9CaYm3Yk2kiCqveg-hZbzsgBZg/viewform?usp=send_form" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="floating-enroll-btn"
-        >
+        <Link to="/enroll" className="floating-enroll-btn">
           <span className="btn-text">Enroll Now!</span>
-        </a>
+        </Link>
       </motion.div>
     </motion.div>
   );

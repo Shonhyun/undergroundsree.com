@@ -1,8 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
-import { ReferralCallout, PriceLists } from '../components/PricingTables';
-import { APP_STORE_LINK, PLAY_STORE_LINK } from '../data/plans';
+import { ReferralCallout, PromoPosters, PriceLists } from '../components/PricingTables';
+import {
+  APP_STORE_LINK,
+  PLAY_STORE_LINK,
+  ENROLL_FORM_LINK,
+  ENROLL_STEPS,
+} from '../data/plans';
 import appStoreImg from '../assets/app-store.png';
 import playStoreImg from '../assets/play-store.png';
 import './Enroll.css';
@@ -20,14 +25,15 @@ const Enroll: React.FC = () => (
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           <span className="enroll-eyebrow">Programs &amp; Pricing</span>
-          <h1>Enroll in Undergrounds</h1>
+          <h1>Reviewing for the board exam shouldn't feel this overwhelming.</h1>
           <p>
-            Here's what's available and what it costs. Enrollment and payment are
-            completed inside the Undergrounds app.
+            Too many subjects, too many handouts, too little time. Undergrounds puts your
+            whole review in one place — here's what's available and what it costs.
           </p>
         </motion.div>
 
         <ReferralCallout />
+        <PromoPosters />
         <PriceLists />
 
         {/* App CTA */}
@@ -43,6 +49,16 @@ const Enroll: React.FC = () => (
             Download Undergrounds to enroll, pay, and start reviewing. Everything you
             need is in your pocket.
           </p>
+
+          <ol className="enroll-steps">
+            {ENROLL_STEPS.map((step, i) => (
+              <li key={i}>
+                <span className="enroll-step-num">{i + 1}</span>
+                {step}
+              </li>
+            ))}
+          </ol>
+
           <div className="enroll-cta-actions">
             <motion.a
               href={APP_STORE_LINK}
@@ -74,6 +90,18 @@ const Enroll: React.FC = () => (
                 <strong>Google Play</strong>
               </div>
             </motion.a>
+          </div>
+
+          <div className="enroll-form-alt">
+            <span>Prefer to sign up through the website?</span>
+            <a
+              href={ENROLL_FORM_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline"
+            >
+              Fill out the enrollment form
+            </a>
           </div>
         </motion.div>
 
