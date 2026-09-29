@@ -29,10 +29,10 @@ export const MOCK_PLANS: Plan[] = [
 export const ALL_PLANS: Plan[] = [...REVIEW_PLANS, ...MOCK_PLANS];
 
 /* ---------------------------------------------------------------------------
-   REFERRAL DISCOUNT — still awaiting the client's confirmation.
-   Taken from the brief as: "invite a friend and Full Enrollment drops from
-   about 8,000 to about 7,000" — i.e. 1 invite, P1,000 off, Full Enrollment.
-   Changing these three values updates every page that shows the offer.
+   REFERRAL DISCOUNT — confirmed by the campaign posters (app-promo1/2.png):
+   "Invite 1 friend. Both save P1,000." Both the referrer and the friend get
+   P1,000 off their enrollment.
+   Changing these values updates every page that shows the offer.
    --------------------------------------------------------------------------- */
 export const REFERRAL_INVITES_REQUIRED = 1;
 export const REFERRAL_DISCOUNT = 1000;
@@ -46,3 +46,16 @@ export const APP_STORE_LINK =
   'https://apps.apple.com/us/app/undergrounds-ree-review/id6745921735';
 export const PLAY_STORE_LINK =
   'https://play.google.com/store/apps/details?id=com.undergrounds.reviewcenterapp&pcampaignid=web_share';
+
+/** Enrollment form, for students who would rather sign up through the website. */
+export const ENROLL_FORM_LINK =
+  'https://docs.google.com/forms/d/e/1FAIpQLSdUGopgYWyTpyTDef17rbCt9CaYm3Yk2kiCqveg-hZbzsgBZg/viewform?usp=send_form';
+
+/** How a student enrolls, shown on the Enroll page. `action` renders in bold. */
+export const ENROLL_STEPS = [
+  { action: 'Download Undergrounds REE', detail: 'from the App Store or Google Play.' },
+  { action: 'Create your account', detail: 'by opening the app and signing up.' },
+  { action: 'Log in', detail: 'using the account you just created.' },
+  { action: 'Go to the Payments screen', detail: 'and choose your program.' },
+  { action: 'Complete your payment', detail: "and you're enrolled." },
+];

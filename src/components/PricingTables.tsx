@@ -9,11 +9,12 @@ import {
   peso,
   type Plan,
 } from '../data/plans';
+import promoPoster1 from '../assets/app-promo1.png';
+import promoPoster2 from '../assets/app-promo2.png';
 import './PricingTables.css';
 
 const isSingleInvite = REFERRAL_INVITES_REQUIRED === 1;
 const friendWord = isSingleInvite ? 'friend' : 'friends';
-const enrollWord = isSingleInvite ? 'enrolls' : 'enroll';
 
 const IconGift = (
   <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" /><line x1="12" y1="22" x2="12" y2="7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></svg>
@@ -54,21 +55,40 @@ export const ReferralCallout: React.FC = () => {
       <span className="pricing-referral-icon">{IconGift}</span>
       <div className="pricing-referral-body">
         <h3>
-          Invite {REFERRAL_INVITES_REQUIRED} {friendWord}, get {peso(REFERRAL_DISCOUNT)} off{' '}
-          {referralPlan.name}
+          Invite {REFERRAL_INVITES_REQUIRED} {friendWord}. Both save {peso(REFERRAL_DISCOUNT)}.
         </h3>
         <p>
-          Invite {REFERRAL_INVITES_REQUIRED} {friendWord} who {enrollWord} and your{' '}
-          <strong>{referralPlan.name}</strong> drops from{' '}
+          Refer {REFERRAL_INVITES_REQUIRED === 1 ? 'a' : REFERRAL_INVITES_REQUIRED}{' '}
+          {friendWord} to Undergrounds and you <strong>both</strong> get{' '}
+          {peso(REFERRAL_DISCOUNT)} off your enrollment — {referralPlan.name} drops from{' '}
           <span className="pricing-strike">{peso(referralPlan.price)}</span> to{' '}
           <strong className="pricing-referral-price">
             {peso(referralPlan.price - REFERRAL_DISCOUNT)}
-          </strong>.
+          </strong>{' '}
+          for each of you.
         </p>
       </div>
     </motion.div>
   );
 };
+
+/** The two referral campaign posters. */
+export const PromoPosters: React.FC = () => (
+  <motion.div
+    className="pricing-posters"
+    variants={container}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.15 }}
+  >
+    <motion.figure className="pricing-poster" variants={item}>
+      <img src={promoPoster1} alt="Invite a friend and both of you save ₱1,000 on enrollment" loading="lazy" />
+    </motion.figure>
+    <motion.figure className="pricing-poster" variants={item}>
+      <img src={promoPoster2} alt="Invite 1 friend — you both get ₱1,000 off your enrollment" loading="lazy" />
+    </motion.figure>
+  </motion.div>
+);
 
 /** The two read-only price lists. */
 export const PriceLists: React.FC = () => (
@@ -92,4 +112,19 @@ export const PriceLists: React.FC = () => (
       {MOCK_PLANS.map(p => <PriceRow key={p.id} plan={p} />)}
     </div>
   </motion.div>
+);
+
+/**
+ * Price lists on the left, campaign posters stacked down the right.
+ * Collapses to a single column on narrow screens.
+ */
+export const PricingSplit: React.FC = () => (
+  <div className="pricing-split">
+    <div className="pricing-split-main">
+      <PriceLists />
+    </div>
+    <aside className="pricing-split-side">
+      <PromoPosters />
+    </aside>
+  </div>
 );
