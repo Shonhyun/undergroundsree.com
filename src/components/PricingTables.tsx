@@ -72,7 +72,7 @@ export const ReferralCallout: React.FC = () => {
   );
 };
 
-/** The two referral campaign posters, side by side. */
+/** The two referral campaign posters. */
 export const PromoPosters: React.FC = () => (
   <motion.div
     className="pricing-posters"
@@ -112,4 +112,19 @@ export const PriceLists: React.FC = () => (
       {MOCK_PLANS.map(p => <PriceRow key={p.id} plan={p} />)}
     </div>
   </motion.div>
+);
+
+/**
+ * Price lists on the left, campaign posters stacked down the right.
+ * Collapses to a single column on narrow screens.
+ */
+export const PricingSplit: React.FC = () => (
+  <div className="pricing-split">
+    <div className="pricing-split-main">
+      <PriceLists />
+    </div>
+    <aside className="pricing-split-side">
+      <PromoPosters />
+    </aside>
+  </div>
 );

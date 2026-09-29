@@ -57,14 +57,33 @@
   font-size: 18px;
 }
 
+/* --- Split layout: prices left, posters right ------------------------------ */
+
+.pricing-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 30%, 300px);
+  gap: clamp(28px, 4vw, 52px);
+  align-items: start;
+  margin-top: 32px;
+}
+
+.pricing-split-main {
+  min-width: 0;
+}
+
+.pricing-split-side {
+  min-width: 0;
+  /* The price lists open with a heading, so match its optical top */
+  margin-top: 34px;
+}
+
 /* --- Campaign posters ------------------------------------------------------ */
 
 .pricing-posters {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(16px, 2.5vw, 28px);
+  grid-template-columns: 1fr;
+  gap: clamp(16px, 2.5vw, 24px);
   align-items: start;
-  margin-top: 32px;
 }
 
 .pricing-poster {
@@ -150,10 +169,26 @@
 
 /* --- Responsive ----------------------------------------------------------- */
 
-@media (max-width: 700px) {
+@media (max-width: 860px) {
+  .pricing-split {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .pricing-split-side {
+    margin-top: 0;
+  }
+
+  /* Side by side again once they have the full width back */
+  .pricing-posters {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 620px) {
   .pricing-posters {
     grid-template-columns: 1fr;
-    max-width: 420px;
+    max-width: 400px;
     margin-left: auto;
     margin-right: auto;
   }

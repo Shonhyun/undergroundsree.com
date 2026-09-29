@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
-import { ReferralCallout, PromoPosters, PriceLists } from '../components/PricingTables';
+import { ReferralCallout, PricingSplit } from '../components/PricingTables';
 import {
   APP_STORE_LINK,
   PLAY_STORE_LINK,
@@ -33,8 +33,7 @@ const Enroll: React.FC = () => (
         </motion.div>
 
         <ReferralCallout />
-        <PromoPosters />
-        <PriceLists />
+        <PricingSplit />
 
         {/* App CTA */}
         <motion.div
@@ -54,7 +53,9 @@ const Enroll: React.FC = () => (
             {ENROLL_STEPS.map((step, i) => (
               <li key={i}>
                 <span className="enroll-step-num">{i + 1}</span>
-                {step}
+                <span>
+                  <strong>{step.action}</strong> {step.detail}
+                </span>
               </li>
             ))}
           </ol>

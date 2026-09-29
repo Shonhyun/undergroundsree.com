@@ -11,7 +11,7 @@ import playStoreImg from '../assets/play-store.png';
 import qrCodeImg from '../assets/qr-code-group.jpeg';
 import PageTransition from '../components/PageTransition';
 import AppPromoVideo from '../components/AppPromoVideo';
-import { ReferralCallout, PromoPosters, PriceLists } from '../components/PricingTables';
+import { ReferralCallout, PricingSplit } from '../components/PricingTables';
 import { useAppContext } from '../context/AppContext';
 import { appVersions } from './Updates';
 import { ShuffleTypewriterFeatureRow } from '../components/UpdateFeatureRow';
@@ -149,8 +149,7 @@ function Home() {
           </motion.div>
 
           <ReferralCallout />
-          <PromoPosters />
-          <PriceLists />
+          <PricingSplit />
 
           <motion.div
             className="pricing-more"

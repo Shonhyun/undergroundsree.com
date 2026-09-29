@@ -51,11 +51,11 @@ export const PLAY_STORE_LINK =
 export const ENROLL_FORM_LINK =
   'https://docs.google.com/forms/d/e/1FAIpQLSdUGopgYWyTpyTDef17rbCt9CaYm3Yk2kiCqveg-hZbzsgBZg/viewform?usp=send_form';
 
-/** How a student enrolls, shown on the Enroll page. */
+/** How a student enrolls, shown on the Enroll page. `action` renders in bold. */
 export const ENROLL_STEPS = [
-  'Download the Undergrounds app from the App Store or Google Play.',
-  'Open the app and sign up to create your account.',
-  'Log in using the account you just created.',
-  'Go to the Payments screen and choose your program.',
-  "Complete your payment and you're enrolled.",
+  { action: 'Download Undergrounds REE', detail: 'from the App Store or Google Play.' },
+  { action: 'Create your account', detail: 'by opening the app and signing up.' },
+  { action: 'Log in', detail: 'using the account you just created.' },
+  { action: 'Go to the Payments screen', detail: 'and choose your program.' },
+  { action: 'Complete your payment', detail: "and you're enrolled." },
 ];
