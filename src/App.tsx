@@ -11,6 +11,7 @@ import Enroll from './pages/Enroll';
 import Updates from './pages/Updates';
 import Inquiry from './pages/Inquiry';
 import JoinUs from './pages/JoinUs';
+import ReviewsPage from './pages/Reviews';
 import SupportModal from './components/SupportModal';
 import FloatingEnrollButton from './components/FloatingEnrollButton';
 import SmoothScroll from './components/SmoothScroll';
@@ -32,6 +33,7 @@ function AppContent() {
             <Route path="/updates" element={<Updates />} />
             <Route path="/inquiry" element={<Inquiry />} />
             <Route path="/join" element={<JoinUs />} />
+            <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/account-deletion" element={<AccountDeletion />} />

@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Reviews section on Home — a continuously scrolling carousel — and the
+   plain grid used by /reviews.
+   ========================================================================== */
+
+.reviews-section {
+  padding: 120px 0;
+  background-color: var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-bg-tertiary);
+}
+
+.reviews-container {
+  max-width: 1100px;
+}
+
+/* --- Carousel --------------------------------------------------------------
+   The track carries the cards twice. It travels exactly half its width, so
+   the second set lands where the first began and the restart is invisible.
+   ------------------------------------------------------------------------ */
+
+.reviews-marquee {
+  margin-top: 32px;
+  overflow: hidden;
+  /* Fades the cards out at both edges instead of cutting them off */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+}
+
+.reviews-track {
+  display: flex;
+  gap: 18px;
+  width: max-content;
+  animation-name: reviewsScroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  /* duration is set inline, from the number of cards */
+  will-change: transform;
+}
+
+/* Let people read one that catches their eye */
+.reviews-marquee:hover .reviews-track,
+.reviews-marquee:focus-within .reviews-track {
+  animation-play-state: paused;
+}
+
+@keyframes reviewsScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-50% - 9px)); } /* half the gap closes the seam */
+}
+
+.reviews-slide {
+  flex: 0 0 auto;
+  width: clamp(270px, 30vw, 330px);
+}
+
+/* Cards in the carousel sit at a fixed height so the row stays level */
+.reviews-slide .review-card {
+  height: 100%;
+}
+
+/* --- Grid (used on /reviews) ----------------------------------------------- */
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: clamp(16px, 2.4vw, 24px);
+  margin-top: 36px;
+  align-items: start;
+}
+
+.reviews-more {
+  margin-top: 36px;
+  text-align: center;
+}
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .reviews-section {
+    padding: 60px 0;
+  }
+
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reviews-marquee {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Stop the movement and let it be scrolled by hand instead */
+  .reviews-track {
+    animation: none;
+  }
+
+  .reviews-marquee {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}

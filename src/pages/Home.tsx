@@ -12,6 +12,7 @@ import qrCodeImg from '../assets/qr-code-group.jpeg';
 import PageTransition from '../components/PageTransition';
 import AppPromoVideo from '../components/AppPromoVideo';
 import LiveLectureSection from '../components/LiveLectureSection';
+import ReviewsSection from '../components/ReviewsSection';
 import { ReferralCallout, PricingSplit } from '../components/PricingTables';
 import { useAppContext } from '../context/AppContext';
 import { appVersions } from './Updates';
@@ -524,6 +525,9 @@ function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Student reviews — previews the first few, links to the full page */}
+      <ReviewsSection />
 
       {/* Contact Section */}
       <section id="contact" className="contact">
