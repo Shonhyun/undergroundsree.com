@@ -170,9 +170,6 @@ function Home() {
       {/* Live lectures — follows the pricing section */}
       <LiveLectureSection />
 
-      {/* Student reviews — previews the first few, links to the full page */}
-      <ReviewsSection />
-
       {/* Latest Update Section */}
       <section className="latest-update updates-page">
         <div className="container">
@@ -528,6 +525,9 @@ function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Student reviews — previews the first few, links to the full page */}
+      <ReviewsSection />
 
       {/* Contact Section */}
       <section id="contact" className="contact">

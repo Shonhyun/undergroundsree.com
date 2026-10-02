@@ -51,7 +51,9 @@ export const ReviewCard: React.FC<{ review: Review }> = ({ review }) => (
       <span className="review-avatar" aria-hidden="true">{initialOf(review.name)}</span>
       <div className="review-who">
         <strong>{review.name}</strong>
-        <small>{review.role}</small>
+        <small>
+          {review.age ? `${review.age} · ${review.role}` : review.role}
+        </small>
       </div>
     </header>
 
