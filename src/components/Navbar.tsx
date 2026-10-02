@@ -7,6 +7,7 @@ const navLinks = [
   { path: '/', label: 'Home' },
   { path: '/updates', label: 'Updates' },
   { path: '/enroll', label: 'Enroll' },
+  { path: '/reviews', label: 'Reviews' },
   { path: '/support', label: 'Support' },
   { path: '/inquiry', label: 'Inquiry' },
   { path: '/join', label: 'Community' },
