@@ -11,6 +11,7 @@ import playStoreImg from '../assets/play-store.png';
 import qrCodeImg from '../assets/qr-code-group.jpeg';
 import PageTransition from '../components/PageTransition';
 import AppPromoVideo from '../components/AppPromoVideo';
+import LiveLectureSection from '../components/LiveLectureSection';
 import { ReferralCallout, PricingSplit } from '../components/PricingTables';
 import { useAppContext } from '../context/AppContext';
 import { appVersions } from './Updates';
@@ -164,6 +165,9 @@ function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Live lectures — follows the pricing section */}
+      <LiveLectureSection />
 
       {/* Latest Update Section */}
       <section className="latest-update updates-page">
