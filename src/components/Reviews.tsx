@@ -37,11 +37,18 @@ export const StarRating: React.FC<{ rating: number; label?: string }> = ({ ratin
 
 /* --- Single review card ---------------------------------------------------- */
 
-export const ReviewCard: React.FC<{ review: Review }> = ({ review }) => (
+/**
+ * `noAnimate` is for cards inside the carousel: the track is already moving,
+ * so a scroll-triggered entrance would fight it and never settle.
+ */
+export const ReviewCard: React.FC<{ review: Review; noAnimate?: boolean }> = ({
+  review,
+  noAnimate,
+}) => (
   <motion.article
     className={`review-card ${review.isExample ? 'is-example' : ''}`}
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
+    initial={noAnimate ? false : { opacity: 0, y: 20 }}
+    whileInView={noAnimate ? undefined : { opacity: 1, y: 0 }}
     viewport={{ once: true, amount: 0.2 }}
     transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
   >
@@ -78,9 +85,7 @@ export const RatingSummary: React.FC<{ reviews: Review[] }> = ({ reviews }) => {
       <div className="review-score">
         <span className="review-score-value">{average.toFixed(1)}</span>
         <StarRating rating={average} label={`Average rating ${average} out of 5`} />
-        <small>
-          Based on {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
-        </small>
+        <small>Based on student reviews</small>
       </div>
 
       <div className="review-bars">

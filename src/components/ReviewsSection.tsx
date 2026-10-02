@@ -1,13 +1,21 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { PUBLISHED_REVIEWS, HOME_PREVIEW_COUNT } from '../data/reviews';
+import { HOME_PREVIEW_COUNT } from '../data/reviews';
+import { useReviews } from '../hooks/useReviews';
 import { ReviewCard, RatingSummary, ReviewsEmpty } from './Reviews';
 import './ReviewsSection.css';
 
+/** Seconds per card — the whole loop scales with how many are on screen. */
+const SECONDS_PER_CARD = 6;
+
 const ReviewsSection: React.FC = () => {
-  const preview = PUBLISHED_REVIEWS.slice(0, HOME_PREVIEW_COUNT);
-  const hasMore = PUBLISHED_REVIEWS.length > HOME_PREVIEW_COUNT;
+  const { reviews } = useReviews();
+  const preview = reviews.slice(0, HOME_PREVIEW_COUNT);
+
+  // The track holds the cards twice so the loop can restart invisibly at
+  // the halfway point. The copy is hidden from assistive tech.
+  const duration = preview.length * SECONDS_PER_CARD;
 
   return (
     <section id="reviews" className="reviews-section">
@@ -23,7 +31,7 @@ const ReviewsSection: React.FC = () => {
           <p>Reviews from the students reviewing with Undergrounds right now.</p>
         </motion.div>
 
-        {PUBLISHED_REVIEWS.length === 0 ? (
+        {preview.length === 0 ? (
           <>
             <ReviewsEmpty compact />
             <div className="reviews-more">
@@ -32,18 +40,28 @@ const ReviewsSection: React.FC = () => {
           </>
         ) : (
           <>
-            <RatingSummary reviews={PUBLISHED_REVIEWS} />
+            <RatingSummary reviews={reviews} />
 
-            <div className="reviews-grid">
-              {preview.map(review => <ReviewCard key={review.id} review={review} />)}
+            <div className="reviews-marquee">
+              <div
+                className="reviews-track"
+                style={{ animationDuration: `${duration}s` }}
+              >
+                {preview.map(review => (
+                  <div className="reviews-slide" key={review.id}>
+                    <ReviewCard review={review} noAnimate />
+                  </div>
+                ))}
+                {preview.map(review => (
+                  <div className="reviews-slide" key={`dup-${review.id}`} aria-hidden="true">
+                    <ReviewCard review={review} noAnimate />
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="reviews-more">
-              <Link to="/reviews" className="btn btn-primary">
-                {hasMore
-                  ? `See all ${PUBLISHED_REVIEWS.length} reviews`
-                  : 'See all reviews'}
-              </Link>
+              <Link to="/reviews" className="btn btn-primary">See all reviews</Link>
             </div>
           </>
         )}

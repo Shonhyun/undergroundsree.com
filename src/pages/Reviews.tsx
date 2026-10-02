@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
 import { ReviewCard, RatingSummary, ReviewsEmpty } from '../components/Reviews';
-import { PUBLISHED_REVIEWS } from '../data/reviews';
+import { useReviews } from '../hooks/useReviews';
 import { db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './Reviews.css';
@@ -10,6 +10,7 @@ import './Reviews.css';
 const MAX_TEXT = 600;
 
 const ReviewsPage: React.FC = () => {
+  const { reviews, add } = useReviews();
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [rating, setRating] = useState(0);
@@ -28,17 +29,20 @@ const ReviewsPage: React.FC = () => {
 
     setSubmitting(true);
     setError(null);
+    const entry = {
+      name: name.trim(),
+      role: role.trim(),
+      rating,
+      text: text.trim(),
+    };
+
     try {
-      await addDoc(collection(db, 'reviews'), {
-        name: name.trim(),
-        role: role.trim(),
-        rating,
-        text: text.trim(),
-        // Held back until an admin approves it, so the page cannot be
-        // used to publish anything straight onto the site.
-        status: 'pending',
+      const doc = await addDoc(collection(db, 'reviews'), {
+        ...entry,
         createdAt: serverTimestamp(),
       });
+      // Show it straight away rather than waiting for a refetch.
+      add({ ...entry, id: doc.id, date: new Date().toISOString().slice(0, 10) });
       setSubmitted(true);
     } catch (err) {
       console.error('Review submission failed:', err);
@@ -76,18 +80,18 @@ const ReviewsPage: React.FC = () => {
             </p>
           </motion.div>
 
-          {PUBLISHED_REVIEWS.length > 0 && (
+          {reviews.length > 0 ? (
             <>
-              <RatingSummary reviews={PUBLISHED_REVIEWS} />
+              <RatingSummary reviews={reviews} />
               <div className="reviews-grid">
-                {PUBLISHED_REVIEWS.map(review => (
+                {reviews.map(review => (
                   <ReviewCard key={review.id} review={review} />
                 ))}
               </div>
             </>
+          ) : (
+            <ReviewsEmpty />
           )}
-
-          {PUBLISHED_REVIEWS.length === 0 && <ReviewsEmpty />}
 
           {/* --- Write a review --- */}
           <motion.div
@@ -101,10 +105,10 @@ const ReviewsPage: React.FC = () => {
 
             {submitted ? (
               <div className="review-thanks">
-                <h3>Thank you — we got it.</h3>
+                <h3>Thank you — your review is live.</h3>
                 <p>
-                  Your review has been sent for approval. Once it is checked it will
-                  appear on this page.
+                  It is now on this page with everyone else's. Scroll up and you will
+                  find it at the top.
                 </p>
                 <button type="button" className="btn btn-outline" onClick={resetForm}>
                   Write another
@@ -187,8 +191,8 @@ const ReviewsPage: React.FC = () => {
                 {error && <p className="review-error">{error}</p>}
 
                 <p className="review-note">
-                  Reviews are checked before they appear. Only share a name you are happy
-                  to have published.
+                  Your review goes live straight away. Only share a name you are happy to
+                  have published.
                 </p>
 
                 <button
