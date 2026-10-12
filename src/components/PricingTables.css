@@ -64,7 +64,8 @@
   grid-template-columns: minmax(0, 1fr) clamp(220px, 30%, 300px);
   gap: clamp(28px, 4vw, 52px);
   align-items: start;
-  margin-top: 32px;
+  /* Matches the installment block's spacing, so the stack reads evenly */
+  margin-top: clamp(28px, 4vw, 44px);
 }
 
 .pricing-split-main {

@@ -10,10 +10,6 @@ import {
 import installmentPoster from '../assets/installment-plan.jpg';
 import './InstallmentPlans.css';
 
-const IconSpark = (
-  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5l-2.2-6.3L3.5 10l6.3-1.7z" /></svg>
-);
-
 const container = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
@@ -51,8 +47,6 @@ const InstallmentPlans: React.FC = () => {
       </figure>
 
       <div className="installment-body">
-        <span className="installment-tag">{IconSpark} New feature</span>
-
         <h3>Review now, pay over time.</h3>
         <p className="installment-intro">
           Enroll today and pay in installments. Split your {installmentPlan.name} payment
