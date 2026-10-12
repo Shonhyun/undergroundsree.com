@@ -11,6 +11,7 @@ import playStoreImg from '../assets/play-store.png';
 import qrCodeImg from '../assets/qr-code-group.jpeg';
 import PageTransition from '../components/PageTransition';
 import AppPromoVideo from '../components/AppPromoVideo';
+import InstallmentPlans from '../components/InstallmentPlans';
 import LiveLectureSection from '../components/LiveLectureSection';
 import ReviewsSection from '../components/ReviewsSection';
 import { ReferralCallout, PricingSplit } from '../components/PricingTables';
@@ -150,6 +151,7 @@ function Home() {
             <p>Choose the program that fits you. Enrollment and payment are completed inside the Undergrounds app.</p>
           </motion.div>
 
+          <InstallmentPlans />
           <ReferralCallout />
           <PricingSplit />
 
