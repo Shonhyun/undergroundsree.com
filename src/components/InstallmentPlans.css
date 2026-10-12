@@ -1,0 +1,163 @@
+/* ==========================================================================
+   Installment options — poster on the left, the three plans on the right.
+   Shown inside the pricing section on Home and on the Enroll page.
+   ========================================================================== */
+
+.installment {
+  display: grid;
+  grid-template-columns: clamp(200px, 26%, 280px) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 44px);
+  align-items: center;
+  padding: clamp(22px, 3vw, 32px);
+  margin-top: 32px;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-bg-tertiary);
+}
+
+/* --- Poster --------------------------------------------------------------- */
+
+.installment-poster {
+  margin: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--color-bg-tertiary);
+  box-shadow: var(--shadow-md);
+}
+
+.installment-poster img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* --- Copy ----------------------------------------------------------------- */
+
+.installment-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 4px 13px;
+  border-radius: var(--radius-full);
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.installment-body h3 {
+  font-size: clamp(24px, 3.2vw, 32px);
+  letter-spacing: -0.9px;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+
+.installment-intro {
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+
+/* --- The three options ----------------------------------------------------- */
+
+.installment-options {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 22px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.installment-option {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-primary);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+/* Paying in full carries no surcharge, so it reads as the plain option */
+.installment-option.is-full {
+  border-color: var(--color-bg-tertiary);
+}
+
+.installment-option-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+}
+
+.installment-amount {
+  font-size: clamp(22px, 2.6vw, 27px);
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1.1;
+  color: var(--color-accent);
+}
+
+.installment-option.is-full .installment-amount {
+  color: var(--color-text-main);
+}
+
+.installment-amount small {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.installment-note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.installment-total {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-text-light);
+}
+
+.installment-how {
+  color: var(--color-text-muted);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.installment-how strong {
+  color: var(--color-text-main);
+}
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 820px) {
+  .installment {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .installment-poster {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .installment-intro {
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .installment-options {
+    grid-template-columns: 1fr;
+  }
+}

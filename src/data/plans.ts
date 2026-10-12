@@ -40,6 +40,38 @@ export const REFERRAL_APPLIES_TO = 'full';
 
 export const referralPlan = ALL_PLANS.find(p => p.id === REFERRAL_APPLIES_TO);
 
+/* ---------------------------------------------------------------------------
+   INSTALLMENTS — split Full Enrollment over several months for a surcharge.
+   Monthly figures are computed from the plan price rather than written in, so
+   a price change carries through instead of leaving stale numbers on a page
+   that quotes money.
+   --------------------------------------------------------------------------- */
+export const INSTALLMENT_APPLIES_TO = 'full';
+
+export const installmentPlan = ALL_PLANS.find(p => p.id === INSTALLMENT_APPLIES_TO);
+
+export type InstallmentOption = {
+  months: number;
+  label: string;
+  /** Surcharge on the plan price, as a fraction. 0 for paying in full. */
+  interest: number;
+  note: string;
+};
+
+export const INSTALLMENT_OPTIONS: InstallmentOption[] = [
+  { months: 1, label: 'Pay in full', interest: 0, note: 'One payment' },
+  { months: 3, label: '3 months', interest: 0.0625, note: '+6.25% interest' },
+  { months: 5, label: '5 months', interest: 0.125, note: '+12.5% interest' },
+];
+
+/** What one monthly payment comes to, rounded to the peso. */
+export const monthlyPayment = (price: number, option: InstallmentOption) =>
+  Math.round((price * (1 + option.interest)) / option.months);
+
+/** What the plan costs in total under this option. */
+export const installmentTotal = (price: number, option: InstallmentOption) =>
+  monthlyPayment(price, option) * option.months;
+
 export const peso = (n: number) => '₱' + n.toLocaleString('en-PH');
 
 export const APP_STORE_LINK =

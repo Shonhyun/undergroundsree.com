@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
+import InstallmentPlans from '../components/InstallmentPlans';
 import { ReferralCallout, PricingSplit } from '../components/PricingTables';
 import {
   APP_STORE_LINK,
@@ -32,6 +33,7 @@ const Enroll: React.FC = () => (
           </p>
         </motion.div>
 
+        <InstallmentPlans />
         <ReferralCallout />
         <PricingSplit />
 
