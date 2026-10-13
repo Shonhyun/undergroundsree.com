@@ -1407,7 +1407,7 @@ body, .navbar, .footer, .feature-card, .offer-card, .contact-card, .modal-conten
 .mobile-menu-links {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 26px;
   text-align: center;
 }
 
@@ -1421,6 +1421,103 @@ body, .navbar, .footer, .feature-card, .offer-card, .contact-card, .modal-conten
 
 .mobile-menu-links a.active {
   color: var(--color-accent);
+}
+
+/* Legal and secondary pages, set apart below a rule in the drawer */
+.mobile-menu-divider {
+  width: 56px;
+  height: 1px;
+  margin: 2px auto;
+  background: var(--color-bg-tertiary);
+}
+
+.mobile-menu-links a.mobile-menu-secondary {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.mobile-menu-links a.mobile-menu-secondary.active {
+  color: var(--color-accent);
+}
+
+/* --- "More" dropdown (desktop) -------------------------------------------- */
+
+.nav-more {
+  position: relative;
+}
+
+.nav-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 0;
+  background: transparent;
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.nav-more-btn:hover,
+.nav-more-btn.is-open,
+.nav-more-btn.active {
+  color: var(--color-accent);
+}
+
+.nav-more-btn svg {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-more-btn.is-open svg {
+  transform: rotate(180deg);
+}
+
+.nav-more-panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  min-width: 212px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-bg-tertiary);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+}
+
+/* Overrides the underline treatment the bar's links use */
+.nav-links .nav-more-panel a {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-links .nav-more-panel a::after {
+  display: none;
+}
+
+.nav-links .nav-more-panel a:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-main);
+}
+
+.nav-links .nav-more-panel a.active {
+  color: var(--color-accent);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-more-btn svg {
+    transition: none;
+  }
 }
 
 @media (max-width: 768px) {
